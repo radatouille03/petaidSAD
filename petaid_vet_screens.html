@@ -1,0 +1,313 @@
+
+<style>
+  .screen-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; font-weight: 500; }
+  .screen { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 2rem; }
+  .nav { background: #085041; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { color: #fff; font-size: 18px; font-weight: 500; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-user { color: #fff; font-size: 13px; }
+  .nav-logout { background: rgba(255,255,255,0.15); color: #fff; border: none; border-radius: var(--border-radius-md); padding: 5px 12px; font-size: 13px; cursor: pointer; }
+  .layout { display: grid; grid-template-columns: 200px 1fr; min-height: 500px; }
+  .sidebar { background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); padding: 20px 0; }
+  .sidebar-section { font-size: 11px; color: var(--color-text-secondary); padding: 8px 20px 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; }
+  .sidebar-item.active { background: #E1F5EE; color: #085041; font-weight: 500; border-right: 2px solid #085041; }
+  .sidebar-item i { font-size: 16px; }
+  .main { padding: 24px; }
+  .page-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 24px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 16px; }
+  .stat-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .stat-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .section-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 12px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; }
+  .badge-green { background: #E1F5EE; color: #0F6E56; }
+  .badge-amber { background: #FAEEDA; color: #854F0B; }
+  .badge-red { background: #FCEBEB; color: #A32D2D; }
+  .badge-gray { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+  .pending-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px; margin-bottom: 10px; cursor: pointer; }
+  .pending-card:hover { border-color: #085041; }
+  .pending-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .pending-icon { width: 36px; height: 36px; border-radius: var(--border-radius-md); background: #E1F5EE; display: flex; align-items: center; justify-content: center; color: #085041; font-size: 16px; flex-shrink: 0; }
+  .pending-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); flex: 1; }
+  .pending-meta { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  .btn-approve { background: #0F6E56; color: #fff; border: none; border-radius: var(--border-radius-md); padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .btn-reject { background: transparent; color: #A32D2D; border: 1px solid #A32D2D; border-radius: var(--border-radius-md); padding: 8px 18px; font-size: 13px; cursor: pointer; }
+  .btn-outline { background: transparent; color: #085041; border: 1px solid #085041; border-radius: var(--border-radius-md); padding: 8px 18px; font-size: 13px; cursor: pointer; }
+  .review-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+  .content-preview { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 20px; }
+  .preview-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+  .preview-meta { display: flex; gap: 10px; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 14px; flex-wrap: wrap; }
+  .preview-body { font-size: 13px; color: var(--color-text-secondary); line-height: 1.7; }
+  .step-item { display: flex; gap: 10px; margin-bottom: 12px; }
+  .step-num { width: 24px; height: 24px; border-radius: 50%; background: #085041; color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-text { font-size: 13px; color: var(--color-text-primary); line-height: 1.5; flex: 1; }
+  .review-panel { display: flex; flex-direction: column; gap: 12px; }
+  .review-box { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 16px; }
+  .review-box-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 10px; }
+  .info-row { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { color: var(--color-text-secondary); }
+  .info-val { color: var(--color-text-primary); font-weight: 500; }
+  .form-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 6px; display: block; }
+  .form-textarea { width: 100%; padding: 9px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 13px; background: var(--color-background-primary); color: var(--color-text-primary); box-sizing: border-box; min-height: 80px; resize: vertical; }
+  .activity-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; background: #0F6E56; margin-top: 5px; flex-shrink: 0; }
+  .activity-info { flex: 1; }
+  .activity-text { font-size: 12px; color: var(--color-text-primary); line-height: 1.4; }
+  .activity-time { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .warning-box { background: #FAEEDA; border-radius: var(--border-radius-md); padding: 12px 14px; border-left: 3px solid #854F0B; }
+  .reject-modal-overlay { background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; min-height: 240px; border-radius: var(--border-radius-lg); padding: 40px; }
+  .reject-modal { background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 24px; max-width: 400px; width: 100%; }
+</style>
+
+<h2 class="sr-only">PetAid veterinary expert dashboard, pending content list, and review content screens</h2>
+
+<p class="screen-label">Screen 17 — Vet Expert Dashboard</p>
+<div class="screen">
+  <div class="nav">
+    <span class="nav-logo"><i class="ti ti-paw" aria-hidden="true"></i> PetAid <span style="font-size:12px;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:999px;margin-left:6px;">Vet Expert</span></span>
+    <div class="nav-right">
+      <span class="nav-user"><i class="ti ti-stethoscope" aria-hidden="true"></i> Dr. Lim</span>
+      <button class="nav-logout"><i class="ti ti-logout" aria-hidden="true"></i> Log out</button>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-section">Overview</div>
+      <div class="sidebar-item active"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="sidebar-section">Review</div>
+      <div class="sidebar-item"><i class="ti ti-clock"></i> Pending Review</div>
+      <div class="sidebar-item"><i class="ti ti-circle-check"></i> Approved</div>
+      <div class="sidebar-item"><i class="ti ti-circle-x"></i> Rejected</div>
+    </div>
+    <div class="main">
+      <div class="page-title">Welcome, Dr. Lim</div>
+      <div class="page-sub">Review and verify medical content submitted by administrators</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Pending review</div>
+          <div class="stat-value" style="color:#854F0B;">4</div>
+          <div class="stat-sub">Requires your attention</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Approved this month</div>
+          <div class="stat-value" style="color:#0F6E56;">12</div>
+          <div class="stat-sub">Content published</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Rejected this month</div>
+          <div class="stat-value" style="color:#A32D2D;">2</div>
+          <div class="stat-sub">Returned for revision</div>
+        </div>
+      </div>
+      <div class="section-title">Pending content</div>
+      <div class="pending-card">
+        <div class="pending-header">
+          <div class="pending-icon"><i class="ti ti-book" aria-hidden="true"></i></div>
+          <div class="pending-title">Rabbit seizure — immediate response</div>
+          <span class="badge badge-amber">Guide</span>
+        </div>
+        <div class="pending-meta">Submitted by Admin Sarah • 2 hours ago • Rabbit • Moderate</div>
+      </div>
+      <div class="pending-card">
+        <div class="pending-header">
+          <div class="pending-icon"><i class="ti ti-video" aria-hidden="true"></i></div>
+          <div class="pending-title">Hamster wound care — visual guide</div>
+          <span class="badge badge-amber">Video</span>
+        </div>
+        <div class="pending-meta">Submitted by Admin Sarah • 1 day ago • Hamster • Moderate</div>
+      </div>
+      <div class="pending-card">
+        <div class="pending-header">
+          <div class="pending-icon"><i class="ti ti-book" aria-hidden="true"></i></div>
+          <div class="pending-title">Cat heatstroke — signs and treatment</div>
+          <span class="badge badge-amber">Guide</span>
+        </div>
+        <div class="pending-meta">Submitted by Admin Sarah • 2 days ago • Cat • Critical</div>
+      </div>
+      <div class="section-title" style="margin-top:20px;">Recent activity</div>
+      <div class="activity-item">
+        <div class="activity-dot" style="background:#0F6E56;"></div>
+        <div class="activity-info">
+          <div class="activity-text">Approved — "Dog CPR basics" — now live</div>
+          <div class="activity-time">Yesterday, 3:20 PM</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-dot" style="background:#A32D2D;"></div>
+        <div class="activity-info">
+          <div class="activity-text">Rejected — "Cat fever treatment" — incorrect dosage information</div>
+          <div class="activity-time">2 days ago, 11:05 AM</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-dot" style="background:#0F6E56;"></div>
+        <div class="activity-info">
+          <div class="activity-text">Approved — "Rabbit choking — what to do" — now live</div>
+          <div class="activity-time">3 days ago, 9:40 AM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="screen-label">Screen 18 — Pending Content List</p>
+<div class="screen">
+  <div class="nav">
+    <span class="nav-logo"><i class="ti ti-paw" aria-hidden="true"></i> PetAid <span style="font-size:12px;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:999px;margin-left:6px;">Vet Expert</span></span>
+    <div class="nav-right">
+      <span class="nav-user"><i class="ti ti-stethoscope" aria-hidden="true"></i> Dr. Lim</span>
+      <button class="nav-logout"><i class="ti ti-logout" aria-hidden="true"></i> Log out</button>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-section">Overview</div>
+      <div class="sidebar-item"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="sidebar-section">Review</div>
+      <div class="sidebar-item active"><i class="ti ti-clock"></i> Pending Review</div>
+      <div class="sidebar-item"><i class="ti ti-circle-check"></i> Approved</div>
+      <div class="sidebar-item"><i class="ti ti-circle-x"></i> Rejected</div>
+    </div>
+    <div class="main">
+      <div class="page-title">Pending Review</div>
+      <div class="page-sub">Content waiting for your medical verification</div>
+      <div class="warning-box" style="margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:500;color:#854F0B;margin-bottom:4px;"><i class="ti ti-alert-triangle" aria-hidden="true"></i> 4 items need your review</div>
+        <div style="font-size:12px;color:#854F0B;">Please review and verify all pending content to ensure accuracy before it goes live.</div>
+      </div>
+      <div class="pending-card">
+        <div class="pending-header">
+          <div class="pending-icon"><i class="ti ti-book" aria-hidden="true"></i></div>
+          <div class="pending-title">Rabbit seizure — immediate response</div>
+          <span class="badge badge-red" style="margin-right:8px;">Critical</span>
+          <span class="badge badge-amber">Pending</span>
+        </div>
+        <div class="pending-meta" style="margin-bottom:10px;">First-aid guide • Submitted by Admin Sarah • 2 hours ago • Rabbit</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-approve"><i class="ti ti-check" aria-hidden="true"></i> Review</button>
+        </div>
+      </div>
+      <div class="pending-card">
+        <div class="pending-header">
+          <div class="pending-icon"><i class="ti ti-video" aria-hidden="true"></i></div>
+          <div class="pending-title">Hamster wound care — visual guide</div>
+          <span class="badge badge-amber" style="margin-right:8px;">Moderate</span>
+          <span class="badge badge-amber">Pending</span>
+        </div>
+        <div class="pending-meta" style="margin-bottom:10px;">Educational video • Submitted by Admin Sarah • 1 day ago • Hamster</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-approve"><i class="ti ti-check" aria-hidden="true"></i> Review</button>
+        </div>
+      </div>
+      <div class="pending-card">
+        <div class="pending-header">
+          <div class="pending-icon"><i class="ti ti-book" aria-hidden="true"></i></div>
+          <div class="pending-title">Cat heatstroke — signs and treatment</div>
+          <span class="badge badge-red" style="margin-right:8px;">Critical</span>
+          <span class="badge badge-amber">Pending</span>
+        </div>
+        <div class="pending-meta" style="margin-bottom:10px;">First-aid guide • Submitted by Admin Sarah • 2 days ago • Cat</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-approve"><i class="ti ti-check" aria-hidden="true"></i> Review</button>
+        </div>
+      </div>
+      <div class="pending-card">
+        <div class="pending-header">
+          <div class="pending-icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
+          <div class="pending-title">General Pet First-Aid Quiz</div>
+          <span class="badge badge-gray" style="margin-right:8px;">All pets</span>
+          <span class="badge badge-amber">Pending</span>
+        </div>
+        <div class="pending-meta" style="margin-bottom:10px;">Quiz • Submitted by Admin Sarah • 3 days ago • All pets</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-approve"><i class="ti ti-check" aria-hidden="true"></i> Review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="screen-label">Screen 19 — Review Content (Approve / Reject)</p>
+<div class="screen">
+  <div class="nav">
+    <span class="nav-logo"><i class="ti ti-paw" aria-hidden="true"></i> PetAid <span style="font-size:12px;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:999px;margin-left:6px;">Vet Expert</span></span>
+    <div class="nav-right">
+      <span class="nav-user"><i class="ti ti-stethoscope" aria-hidden="true"></i> Dr. Lim</span>
+      <button class="nav-logout"><i class="ti ti-logout" aria-hidden="true"></i> Log out</button>
+    </div>
+  </div>
+  <div class="main">
+    <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:12px;"><i class="ti ti-arrow-left" aria-hidden="true"></i> Back to pending list</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div class="page-title">Rabbit seizure — immediate response</div>
+        <div style="font-size:13px;color:var(--color-text-secondary);">First-aid guide • Rabbit • Submitted 2 hours ago</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-reject"><i class="ti ti-x" aria-hidden="true"></i> Reject</button>
+        <button class="btn-approve"><i class="ti ti-check" aria-hidden="true"></i> Approve</button>
+      </div>
+    </div>
+    <div class="review-layout">
+      <div>
+        <div class="content-preview">
+          <div class="preview-title">Rabbit seizure — immediate response</div>
+          <div class="preview-meta">
+            <span><i class="ti ti-paw" aria-hidden="true"></i> Rabbit</span>
+            <span><i class="ti ti-alert-triangle" aria-hidden="true"></i> Moderate</span>
+            <span><i class="ti ti-clock" aria-hidden="true"></i> 4 min read</span>
+          </div>
+          <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:14px;line-height:1.6;">A rabbit seizure can be frightening but knowing how to respond can help keep your rabbit safe. Follow these steps carefully.</div>
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-text">Stay calm and do not restrain your rabbit. Restraining a seizing rabbit can cause injury.</div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-text">Clear the area around the rabbit. Remove any hard or sharp objects that could cause injury during the seizure.</div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-text">Time the seizure. Note when it started and how long it lasts — this is important information for your vet.</div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-text">Keep the rabbit warm and dark. Place a soft cloth nearby but do not cover the rabbit's face.</div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">5</div>
+            <div class="step-text">Contact a vet immediately after the seizure ends, even if the rabbit appears to recover.</div>
+          </div>
+          <div style="background:#FAEEDA;border-radius:var(--border-radius-md);padding:12px 14px;border-left:3px solid #854F0B;margin-top:14px;">
+            <div style="font-size:12px;font-weight:500;color:#854F0B;margin-bottom:4px;"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Warning</div>
+            <div style="font-size:12px;color:#854F0B;">Never put anything in the rabbit's mouth during a seizure.</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-panel">
+        <div class="review-box">
+          <div class="review-box-title">Submission details</div>
+          <div class="info-row"><span class="info-label">Submitted by</span><span class="info-val">Admin Sarah</span></div>
+          <div class="info-row"><span class="info-label">Content type</span><span class="info-val">First-aid guide</span></div>
+          <div class="info-row"><span class="info-label">Species</span><span class="info-val">Rabbit</span></div>
+          <div class="info-row"><span class="info-label">Severity</span><span class="info-val">Moderate</span></div>
+          <div class="info-row"><span class="info-label">Submitted</span><span class="info-val">2 hours ago</span></div>
+        </div>
+        <div class="review-box">
+          <div class="review-box-title">Your notes (required for rejection)</div>
+          <label class="form-label">Add comments or feedback</label>
+          <textarea class="form-textarea" placeholder="e.g. Step 3 contains incorrect information — please revise..."></textarea>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn-approve" style="width:100%;padding:10px;"><i class="ti ti-check" aria-hidden="true"></i> Approve and publish</button>
+          <button class="btn-reject" style="width:100%;padding:10px;"><i class="ti ti-x" aria-hidden="true"></i> Reject with feedback</button>
+          <button class="btn-outline" style="width:100%;padding:10px;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

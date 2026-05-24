@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --color-background-primary: #FFFFFF;
+    --color-background-secondary: #F9FAFB;
+    --color-border-secondary: #E5E7EB;
+    --color-border-tertiary: #F3F4F6;
+    --color-text-primary: #111827;
+    --color-text-secondary: #4B5563;
+    --color-text-danger: #DC2626;
+    --color-border-danger: #FCA5A5;
+    --border-radius-lg: 12px;
+    --border-radius-md: 8px;
+    --border-radius-sm: 4px;
+    --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: #F3F4F6;
+    color: var(--color-text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Flash Messages styling for notifications */
+.flash-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+}
+
+.flash-message {
+    padding: 12px 20px;
+    padding-right: 40px;
+    position: relative;
+    border-radius: var(--border-radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    animation: slideIn 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.flash-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+    padding: 4px;
+}
+
+.flash-close:hover {
+    opacity: 1;
+}
+
+.flash-success {
+    background-color: #DEF7EC;
+    color: #03543F;
+    border: 1px solid #BCF0DA;
+}
+
+.flash-danger {
+    background-color: #FDE8E8;
+    color: #9B1C1C;
+    border: 1px solid #FBD5D5;
+}
+
+.flash-warning {
+    background-color: #FDF6B2;
+    color: #723B13;
+    border: 1px solid #FCE96C;
+}
+
+.flash-info {
+    background-color: #EBF5FF;
+    color: #1E429F;
+    border: 1px solid #C3DDFD;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

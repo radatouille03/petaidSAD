@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}PetAid — Quizzes{% endblock %}
+
+{% block content %}
+<style>
+  .layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 54px); }
+  .sidebar { background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); padding: 20px 0; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 12px 20px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; text-decoration: none; transition: all 0.2s; }
+  .sidebar-item:hover { background: #F3F4F6; color: var(--color-text-primary); }
+  .sidebar-item.active { background: #E1F5EE; color: #0F6E56; font-weight: 600; border-right: 3px solid #0F6E56; }
+  .sidebar-item i { font-size: 16px; }
+  
+  .main { padding: 32px; background: #FFFFFF; }
+  .page-title { font-size: 22px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 6px; }
+  .page-sub { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 24px; }
+  
+  /* Quiz List */
+  .quiz-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+  .quiz-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; text-decoration: none; color: inherit; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: border-color 0.2s; }
+  .quiz-card:hover { border-color: #0F6E56; }
+  .quiz-icon { width: 44px; height: 44px; border-radius: var(--border-radius-md); background: #E1F5EE; display: flex; align-items: center; justify-content: center; color: #0F6E56; font-size: 20px; flex-shrink: 0; }
+  .quiz-info { flex: 1; }
+  .quiz-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 4px; }
+  .quiz-meta { font-size: 13px; color: var(--color-text-secondary); }
+  .quiz-action { font-size: 13px; color: #0F6E56; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+  
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+  .badge-green { background: #E1F5EE; color: #0F6E56; }
+  .badge-amber { background: #FAEEDA; color: #854F0B; }
+  .badge-gray { background: var(--color-border-tertiary); color: var(--color-text-secondary); }
+
+  /* Take Quiz layout */
+  .quiz-header { background: #E1F5EE; padding: 18px 32px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: space-between; }
+  .quiz-progress-text { font-size: 13px; color: #0F6E56; font-weight: 600; }
+  .progress-bar-outer { height: 8px; background: #9FE1CB; border-radius: 4px; flex: 1; margin: 0 20px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: #0F6E56; border-radius: 4px; transition: width 0.3s ease; }
+  
+  .question-body { padding: 32px; max-width: 680px; }
+  .question-num { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 10px; font-weight: 500; }
+  .question-text { font-size: 18px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 24px; line-height: 1.5; }
+  
+  /* Quiz options radio buttons styling */
+  .options-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+  .option-label { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border: 1.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: pointer; font-size: 14px; color: var(--color-text-primary); font-weight: 500; transition: all 0.2s; position: relative; }
+  .option-label:hover { border-color: #0F6E56; background: #F9FAFB; }
+  .option-input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .option-letter { width: 28px; height: 28px; border-radius: 50%; background: var(--color-border-tertiary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; color: var(--color-text-secondary); transition: all 0.2s; }
+  
+  /* Selection styling via JS input checks */
+  .option-input:checked + .option-letter { background: #0F6E56; color: #fff; }
+  .option-label.selected-active { border-color: #0F6E56; background: #E1F5EE; color: #085041; }
+
+  .btn-primary { background: #0F6E56; color: #fff; border: none; border-radius: var(--border-radius-md); padding: 12px 28px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn-primary:hover { background: #0b503e; }
+  
+  .btn-outline { background: transparent; color: #0F6E56; border: 1.5px solid #0F6E56; border-radius: var(--border-radius-md); padding: 12px 28px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn-outline:hover { background: #E1F5EE; }
+
+  /* Results layout */
+  .result-hero { padding: 40px 32px; text-align: center; background: #E1F5EE; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .score-circle { width: 110px; height: 110px; border-radius: 50%; background: #0F6E56; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+  .score-num { font-size: 32px; font-weight: 600; color: #fff; line-height: 1; }
+  .score-total { font-size: 13px; color: rgba(255,255,255,0.85); margin-top: 4px; font-weight: 500; }
+  .result-title { font-size: 22px; font-weight: 600; color: #085041; margin-bottom: 6px; }
+  .result-sub { font-size: 15px; color: #0F6E56; font-weight: 500; }
+  
+  .result-body { padding: 32px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 32px; background: #fff; }
+  .result-stats { display: flex; flex-direction: column; gap: 12px; }
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 13px; font-weight: 500; }
+  .stat-label { color: var(--color-text-secondary); }
+  .stat-val { font-weight: 600; color: var(--color-text-primary); }
+  
+  .history-list { display: flex; flex-direction: column; gap: 10px; }
+  .history-item { display: flex; align-items: center; gap: 16px; padding: 14px 16px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); }
+  .history-info { flex: 1; }
+  .history-title { font-size: 13px; font-weight: 600; color: var(--color-text-primary); }
+  .history-meta { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+  .history-score { font-size: 14px; font-weight: 600; color: #0F6E56; }
+  
+  .answers-review { display: flex; flex-direction: column; gap: 10px; }
+  .answer-item { padding: 14px 18px; border-radius: var(--border-radius-md); font-size: 13px; border: 0.5px solid transparent; }
+  .answer-correct { background: #DEF7EC; color: #03543F; border-color: #BCF0DA; }
+  .answer-wrong { background: #FDE8E8; color: #9B1C1C; border-color: #FBD5D5; }
+  .answer-q { font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+  .answer-a { opacity: 0.9; font-weight: 500; }
+</style>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="{{ url_for('dashboard') }}" class="sidebar-item"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+    <a href="{{ url_for('profile') }}" class="sidebar-item"><i class="ti ti-user"></i> My Profile</a>
+    <a href="{{ url_for('pets_list') }}" class="sidebar-item"><i class="ti ti-paw"></i> My Pets</a>
+    <a href="{{ url_for('search_emergency') }}" class="sidebar-item"><i class="ti ti-search"></i> Search Emergency</a>
+    <a href="{{ url_for('guides_list') }}" class="sidebar-item"><i class="ti ti-book"></i> First-aid Guides</a>
+    <a href="{{ url_for('videos_list') }}" class="sidebar-item"><i class="ti ti-video"></i> Videos</a>
+    <a href="{{ url_for('quizzes_list') }}" class="sidebar-item {% if active_tab == 'quizzes' %}active{% endif %}"><i class="ti ti-clipboard-check"></i> Quizzes</a>
+  </div>
+
+  <div class="main" style="{% if active_tab == 'quiz_take' or active_tab == 'quiz_result' %}padding:0;{% endif %}">
+    {% if active_tab == 'quizzes' %}
+      <!-- Screen 10 — Quiz List -->
+      <div class="page-title">Quizzes</div>
+      <div class="page-sub">Test your knowledge on pet first-aid</div>
+      
+      <div class="quiz-list">
+        {% for q in quizzes %}
+          <a href="{{ url_for('start_quiz', quiz_id=q.id) }}" class="quiz-card">
+            <div class="quiz-icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
+            <div class="quiz-info">
+              <div class="quiz-title">{{ q.title }}</div>
+              <div class="quiz-meta">{{ q.questions|length }} questions • {{ q.species }}</div>
+            </div>
+            
+            {% set score_data = last_scores.get(q.id) %}
+            {% if score_data %}
+              <span class="badge badge-green" style="margin-right:16px;">Completed (Last: {{ score_data.score }}/{{ score_data.total }})</span>
+              <span class="quiz-action">Retake <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+            {% else %}
+              <span class="badge badge-gray" style="margin-right:16px;">Not started</span>
+              <span class="quiz-action">Start <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+
+    {% elif active_tab == 'quiz_take' %}
+      <!-- Screen 10b — Take Quiz (in progress) -->
+      {% set progress = ((question_index + 1) / total_questions * 100)|int %}
+      <div class="quiz-header">
+        <span class="quiz-progress-text">Question {{ question_index + 1 }} of {{ total_questions }}</span>
+        <div class="progress-bar-outer">
+          <div class="progress-bar-fill" style="width: {{ progress }}%"></div>
+        </div>
+        <span class="quiz-progress-text">{{ quiz.title }}</span>
+      </div>
+      
+      <div class="question-body">
+        <div class="question-num">Question {{ question_index + 1 }}</div>
+        <div class="question-text">{{ question.question_text }}</div>
+        
+        <form action="{{ url_for('submit_question') }}" method="POST" id="quizForm">
+          <div class="options-list">
+            <label class="option-label {% if saved_answer == 'A' %}selected-active{% endif %}" onclick="selectOption(this)">
+              <input type="radio" class="option-input" name="answer" value="A" {% if saved_answer == 'A' %}checked{% endif %} required />
+              <div class="option-letter">A</div>
+              <span>{{ question.option_a }}</span>
+            </label>
+            <label class="option-label {% if saved_answer == 'B' %}selected-active{% endif %}" onclick="selectOption(this)">
+              <input type="radio" class="option-input" name="answer" value="B" {% if saved_answer == 'B' %}checked{% endif %} />
+              <div class="option-letter">B</div>
+              <span>{{ question.option_b }}</span>
+            </label>
+            <label class="option-label {% if saved_answer == 'C' %}selected-active{% endif %}" onclick="selectOption(this)">
+              <input type="radio" class="option-input" name="answer" value="C" {% if saved_answer == 'C' %}checked{% endif %} />
+              <div class="option-letter">C</div>
+              <span>{{ question.option_c }}</span>
+            </label>
+            <label class="option-label {% if saved_answer == 'D' %}selected-active{% endif %}" onclick="selectOption(this)">
+              <input type="radio" class="option-input" name="answer" value="D" {% if saved_answer == 'D' %}checked{% endif %} />
+              <div class="option-letter">D</div>
+              <span>{{ question.option_d }}</span>
+            </label>
+          </div>
+          
+          <div style="display:flex;gap:12px;">
+            {% if question_index > 0 %}
+              <a href="{{ url_for('prev_question') }}" class="btn-outline"><i class="ti ti-arrow-left" aria-hidden="true"></i> Previous</a>
+            {% endif %}
+            <button class="btn-primary" type="submit">
+              {% if question_index + 1 == total_questions %}
+                Submit Quiz <i class="ti ti-check" aria-hidden="true"></i>
+              {% else %}
+                Next question <i class="ti ti-arrow-right" aria-hidden="true"></i>
+              {% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <script>
+        function selectOption(label) {
+            // Remove selection highlighting from sibling labels
+            const labels = document.querySelectorAll('.option-label');
+            labels.forEach(l => l.classList.remove('selected-active'));
+            // Highlight current selection
+            label.classList.add('selected-active');
+        }
+      </script>
+
+    {% elif active_tab == 'quiz_result' %}
+      <!-- Screen 11 — View Quiz Result -->
+      <div class="result-hero">
+        <div class="score-circle">
+          <div class="score-num">{{ result.score }}</div>
+          <div class="score-total">out of {{ result.total_questions }}</div>
+        </div>
+        <div class="result-title">Great job, {{ session.get('first_name') }}!</div>
+        <div class="result-sub">You scored {{ ((result.score / result.total_questions) * 100)|int }}% on {{ quiz.title }}</div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
+          <a href="{{ url_for('start_quiz', quiz_id=quiz.id) }}" class="btn-primary">Retake quiz</a>
+          <a href="{{ url_for('quizzes_list') }}" class="btn-outline">Back to quizzes</a>
+        </div>
+      </div>
+      
+      <div class="result-body">
+        <div>
+          <div style="font-size:16px;font-weight:600;color:var(--color-text-primary);margin-bottom:16px;">Summary</div>
+          <div class="result-stats">
+            <div class="stat-row">
+              <span class="stat-label">Correct answers</span>
+              <span class="stat-val" style="color:#0F6E56;">{{ result.score }} / {{ result.total_questions }}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Wrong answers</span>
+              <span class="stat-val" style="color:#A32D2D;">{{ result.total_questions - result.score }} / {{ result.total_questions }}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Percentage</span>
+              <span class="stat-val">{{ ((result.score / result.total_questions) * 100)|int }}%</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Date Completed</span>
+              <span class="stat-val">{{ result.timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+            </div>
+          </div>
+          
+          <div style="font-size:16px;font-weight:600;color:var(--color-text-primary);margin:24px 0 16px;">Past attempts</div>
+          <div class="history-list">
+            {% for past in history %}
+              <div class="history-item">
+                <div class="history-info">
+                  <div class="history-title">{{ quiz.title }}</div>
+                  <div class="history-meta">{{ past.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
+                </div>
+                <span class="history-score">{{ past.score }} / {{ past.total_questions }}</span>
+              </div>
+            {% else %}
+              <div style="font-size:12px;color:var(--color-text-secondary);">No other attempts recorded yet.</div>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <div>
+          <div style="font-size:16px;font-weight:600;color:var(--color-text-primary);margin-bottom:16px;">Answer review</div>
+          <div class="answers-review">
+            {% for q in questions_review %}
+              {% set user_ans = user_answers.get(q.id) or user_answers.get(str(q.id)) %}
+              {% set correct_ans = q.correct_option %}
+              {% set is_correct = (user_ans == correct_ans) %}
+              
+              <div class="answer-item {% if is_correct %}answer-correct{% else %}answer-wrong{% endif %}">
+                <div class="answer-q">
+                  {% if is_correct %}
+                    <i class="ti ti-check" aria-hidden="true"></i>
+                  {% else %}
+                    <i class="ti ti-x" aria-hidden="true"></i>
+                  {% endif %}
+                  Q{{ loop.index }} — {{ q.question_text }}
+                </div>
+                <div class="answer-a">
+                  Your answer: 
+                  {% if user_ans == 'A' %}{{ q.option_a }}
+                  {% elif user_ans == 'B' %}{{ q.option_b }}
+                  {% elif user_ans == 'C' %}{{ q.option_c }}
+                  {% elif user_ans == 'D' %}{{ q.option_d }}
+                  {% else %}None
+                  {% endif %}
+                  {% if is_correct %} ✓ {% else %} (Correct: 
+                  {% if correct_ans == 'A' %}A - {{ q.option_a }}
+                  {% elif correct_ans == 'B' %}B - {{ q.option_b }}
+                  {% elif correct_ans == 'C' %}C - {{ q.option_c }}
+                  {% elif correct_ans == 'D' %}D - {{ q.option_d }}
+                  {% endif %})
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

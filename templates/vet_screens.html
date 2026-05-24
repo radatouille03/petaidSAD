@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block title %}PetAid Vet Expert — Medical Verification{% endblock %}
+
+{% block content %}
+<style>
+  .layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 54px); }
+  .sidebar { background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); padding: 20px 0; }
+  .sidebar-section { font-size: 11px; color: var(--color-text-secondary); padding: 8px 20px 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 12px 20px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; text-decoration: none; transition: all 0.2s; }
+  .sidebar-item:hover { background: #E1F5EE; color: #085041; }
+  .sidebar-item.active { background: #E1F5EE; color: #085041; font-weight: 600; border-right: 3px solid #085041; }
+  .sidebar-item i { font-size: 16px; }
+  
+  .main { padding: 32px; background: #FFFFFF; }
+  .page-title { font-size: 22px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 6px; }
+  .page-sub { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 32px; }
+  
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+  .stat-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; font-weight: 500; }
+  .stat-value { font-size: 28px; font-weight: 600; color: var(--color-text-primary); }
+  .stat-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; font-weight: 500; }
+  
+  .section-title { font-size: 16px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 16px; }
+  
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+  .badge-green { background: #E1F5EE; color: #0F6E56; }
+  .badge-amber { background: #FAEEDA; color: #854F0B; }
+  .badge-red { background: #FCEBEB; color: #A32D2D; }
+  .badge-gray { background: var(--color-border-tertiary); color: var(--color-text-secondary); }
+
+  /* Pending card design */
+  .pending-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: border-color 0.2s; position: relative; }
+  .pending-card:hover { border-color: #085041; }
+  .pending-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .pending-icon { width: 40px; height: 40px; border-radius: var(--border-radius-md); background: #E1F5EE; display: flex; align-items: center; justify-content: center; color: #085041; font-size: 18px; flex-shrink: 0; }
+  .pending-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); flex: 1; }
+  .pending-meta { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+
+  /* Buttons */
+  .btn-approve { background: #0F6E56; color: #fff; border: none; border-radius: var(--border-radius-md); padding: 10px 20px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; justify-content: center; }
+  .btn-approve:hover { background: #0b503e; }
+  
+  .btn-reject { background: transparent; color: #A32D2D; border: 1.5px solid #A32D2D; border-radius: var(--border-radius-md); padding: 9px 20px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; justify-content: center; }
+  .btn-reject:hover { background: #FCEBEB; }
+  
+  .btn-outline { background: transparent; color: #085041; border: 1.5px solid #085041; border-radius: var(--border-radius-md); padding: 9px 20px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; justify-content: center; }
+  .btn-outline:hover { background: #E1F5EE; }
+
+  /* Review Screen Details */
+  .review-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; }
+  .content-preview { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 24px; }
+  .preview-title { font-size: 18px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 8px; }
+  .preview-meta { display: flex; gap: 14px; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 20px; flex-wrap: wrap; font-weight: 500; }
+  .preview-meta span { display: flex; align-items: center; gap: 4px; }
+  .preview-body { font-size: 13px; color: var(--color-text-secondary); line-height: 1.7; }
+  
+  .step-item { display: flex; gap: 12px; margin-bottom: 16px; }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; background: #085041; color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .step-text { font-size: 13px; color: var(--color-text-primary); line-height: 1.5; flex: 1; }
+  
+  .review-panel { display: flex; flex-direction: column; gap: 16px; }
+  .review-box { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 20px; }
+  .review-box-title { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .info-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-secondary); }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { color: var(--color-text-secondary); font-weight: 500; }
+  .info-val { color: var(--color-text-primary); font-weight: 600; }
+  
+  .form-textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 13px; background: var(--color-background-primary); color: var(--color-text-primary); box-sizing: border-box; min-height: 90px; resize: vertical; outline: none; }
+  .form-textarea:focus { border-color: #085041; }
+  
+  .activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .activity-dot { width: 10px; height: 10px; border-radius: 50%; background: #0F6E56; margin-top: 5px; flex-shrink: 0; }
+  .activity-info { flex: 1; }
+  .activity-text { font-size: 13px; color: var(--color-text-primary); line-weight: 1.4; }
+  .activity-time { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
+  
+  .warning-box { background: #FAEEDA; border-radius: var(--border-radius-md); padding: 14px; border-left: 4px solid #854F0B; color: #854F0B; }
+  
+  /* Quiz layout preview */
+  .preview-question { padding: 12px 16px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); margin-bottom: 12px; }
+  .preview-question-text { font-weight: 600; margin-bottom: 8px; }
+  .preview-question-opts { font-size:12px; color:var(--color-text-secondary); padding-left: 12px; line-height: 1.6; }
+</style>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">Overview</div>
+    <a href="{{ url_for('vet_dashboard') }}" class="sidebar-item {% if active_tab == 'dashboard' %}active{% endif %}"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+    <div class="sidebar-section">Review Panel</div>
+    <a href="{{ url_for('vet_pending') }}" class="sidebar-item {% if active_tab == 'pending' %}active{% endif %}"><i class="ti ti-clock"></i> Pending Review</a>
+    <a href="{{ url_for('vet_history', status='Approved') }}" class="sidebar-item {% if active_tab == 'approved' %}active{% endif %}"><i class="ti ti-circle-check"></i> Approved Content</a>
+    <a href="{{ url_for('vet_history', status='Rejected') }}" class="sidebar-item {% if active_tab == 'rejected' %}active{% endif %}"><i class="ti ti-circle-x"></i> Rejected Content</a>
+  </div>
+
+  <div class="main">
+    {% if active_tab == 'dashboard' %}
+      <!-- Screen 17 — Vet Expert Dashboard -->
+      <div class="page-title">Welcome, {{ session.get('first_name') }} {{ session.get('last_name') }}</div>
+      <div class="page-sub">Review and verify medical content submitted by administrators</div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Pending review</div>
+          <div class="stat-value" style="color:#854F0B;">{{ pending|length }}</div>
+          <div class="stat-sub">Requires your attention</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Approved items</div>
+          <div class="stat-value" style="color:#0F6E56;">{{ approved_count }}</div>
+          <div class="stat-sub">Published to users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Rejected items</div>
+          <div class="stat-value" style="color:#A32D2D;">{{ rejected_count }}</div>
+          <div class="stat-sub">Returned for revisions</div>
+        </div>
+      </div>
+      
+      <div class="section-title">Pending content (Action Required)</div>
+      {% for item in pending[:3] %}
+        <div class="pending-card" onclick="location.href='{{ url_for('vet_review', content_id=item.id) }}'">
+          <div class="pending-header">
+            <div class="pending-icon">
+              {% if item.content_type == 'guide' %}<i class="ti ti-book" aria-hidden="true"></i>
+              {% elif item.content_type == 'video' %}<i class="ti ti-video" aria-hidden="true"></i>
+              {% else %}<i class="ti ti-clipboard-check" aria-hidden="true"></i>
+              {% endif %}
+            </div>
+            <div class="pending-title">{{ item.title }}</div>
+            <span class="badge badge-amber">{{ item.content_type }}</span>
+          </div>
+          <div class="pending-meta">
+            Submitted by Admin {{ item.author.first_name }} • {{ item.publish_date.strftime('%Y-%m-%d') }} • Applies to {{ item.species }}
+          </div>
+        </div>
+      {% else %}
+        <div style="text-align:center; padding:32px; color:var(--color-text-secondary); background:var(--color-background-secondary); border-radius: var(--border-radius-lg);">
+          All submitted content has been successfully reviewed! No items pending.
+        </div>
+      {% endfor %}
+      
+      <div class="section-title" style="margin-top:24px;">Recent activity</div>
+      <div class="activity-item">
+        <div class="activity-dot" style="background:#0F6E56;"></div>
+        <div class="activity-info">
+          <div class="activity-text">Approved — "Dog CPR basics" — now live in patient libraries.</div>
+          <div class="activity-time">Yesterday, 3:20 PM</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-dot" style="background:#A32D2D;"></div>
+        <div class="activity-info">
+          <div class="activity-text">Rejected — "Cat fever treatment" — incorrect dosage guidelines provided.</div>
+          <div class="activity-time">2 days ago, 11:05 AM</div>
+        </div>
+      </div>
+
+    {% elif active_tab == 'pending' %}
+      <!-- Screen 18 — Pending Content List -->
+      <div class="page-title">Pending Review</div>
+      <div class="page-sub">Content waiting for your medical verification</div>
+      
+      {% if pending %}
+        <div class="warning-box" style="margin-bottom:20px; display:flex; align-items:center; gap:8px;">
+          <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+          <div><strong>{{ pending|length }} items require review:</strong> Please review and verify safety instructions before publishing.</div>
+        </div>
+        
+        {% for item in pending %}
+          <div class="pending-card">
+            <div class="pending-header">
+              <div class="pending-icon">
+                {% if item.content_type == 'guide' %}<i class="ti ti-book" aria-hidden="true"></i>
+                {% elif item.content_type == 'video' %}<i class="ti ti-video" aria-hidden="true"></i>
+                {% else %}<i class="ti ti-clipboard-check" aria-hidden="true"></i>
+                {% endif %}
+              </div>
+              <div class="pending-title">{{ item.title }}</div>
+              <span class="badge {% if item.severity == 'Critical' %}badge-red{% else %}badge-amber{% endif %}" style="margin-right:8px;">{{ item.severity or 'Quiz' }}</span>
+              <span class="badge badge-gray">{{ item.content_type }}</span>
+            </div>
+            <div class="pending-meta" style="margin-bottom:12px;">
+              Submitted by Admin {{ item.author.first_name }} • {{ item.publish_date.strftime('%Y-%m-%d') }} • Applies to {{ item.species }}
+            </div>
+            <a href="{{ url_for('vet_review', content_id=item.id) }}" class="btn-approve"><i class="ti ti-check" aria-hidden="true"></i> Review Content</a>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div style="text-align:center; padding:48px; color:var(--color-text-secondary); background:var(--color-background-secondary); border-radius: var(--border-radius-lg);">
+          <i class="ti ti-circle-check" style="font-size: 32px; display:block; margin-bottom:12px; color:#0F6E56;"></i>
+          No items waiting for verification. Everything is up to date!
+        </div>
+      {% endif %}
+
+    {% elif active_tab in ['approved', 'rejected'] %}
+      <!-- Vet history review lists -->
+      <div class="page-title">{{ active_tab | capitalize }} Content</div>
+      <div class="page-sub">Historical logs of content you have verified</div>
+      
+      {% for item in history_items %}
+        <div class="pending-card">
+          <div class="pending-header">
+            <div class="pending-icon">
+              {% if item.content_type == 'guide' %}<i class="ti ti-book" aria-hidden="true"></i>
+              {% elif item.content_type == 'video' %}<i class="ti ti-video" aria-hidden="true"></i>
+              {% else %}<i class="ti ti-clipboard-check" aria-hidden="true"></i>
+              {% endif %}
+            </div>
+            <div class="pending-title">{{ item.title }}</div>
+            <span class="badge {% if active_tab == 'approved' %}badge-green{% else %}badge-red{% endif %}">{{ item.verification_status }}</span>
+          </div>
+          <div class="pending-meta">
+            Submitted by Admin {{ item.author.first_name }} • Species: {{ item.species }}
+            {% if item.rejection_feedback %}
+              <div style="margin-top:8px; font-weight: 500; color: var(--color-text-danger);">
+                Feedback left: "{{ item.rejection_feedback }}"
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% else %}
+        <div style="text-align:center; padding:32px; color:var(--color-text-secondary); background:var(--color-background-secondary); border-radius: var(--border-radius-lg);">
+          No items in this category yet.
+        </div>
+      {% endfor %}
+
+    {% elif active_tab == 'review' %}
+      <!-- Screen 19 — Review Content (Approve / Reject) -->
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:12px; cursor:pointer;" onclick="location.href='{{ url_for('vet_pending') }}'"><i class="ti ti-arrow-left" aria-hidden="true"></i> Back to pending list</div>
+      
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <div>
+          <div class="page-title">{{ item.title }}</div>
+          <div style="font-size:13px;color:var(--color-text-secondary);">
+            {{ item.content_type | capitalize }} • Species: {{ item.species }} • Submitted by Admin {{ item.author.first_name }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="review-layout">
+        <div>
+          <div class="content-preview">
+            <div class="preview-title">{{ item.title }}</div>
+            <div class="preview-meta">
+              <span><i class="ti ti-paw" aria-hidden="true"></i> {{ item.species }}</span>
+              {% if item.severity %}
+                <span><i class="ti ti-alert-triangle" aria-hidden="true"></i> {{ item.severity }}</span>
+              {% endif %}
+              <span><i class="ti ti-clock" aria-hidden="true"></i> Submitted {{ item.publish_date.strftime('%Y-%m-%d') }}</span>
+            </div>
+            
+            <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:20px;line-height:1.6;">{{ item.description }}</div>
+            
+            {% if item.content_type == 'guide' %}
+              <div style="font-weight:600; color:var(--color-text-primary); margin-bottom:12px;">Step-by-step Instructions:</div>
+              {% for step in item.steps %}
+                <div class="step-item">
+                  <div class="step-num">{{ step.step_number }}</div>
+                  <div class="step-text"><strong>{{ step.title }}</strong>: {{ step.description }}</div>
+                </div>
+              {% endfor %}
+              
+              <div style="background:#FAEEDA;border-radius:var(--border-radius-md);padding:14px;border-left:4px solid #854F0B;margin-top:20px; color:#854F0B; font-size:12px;">
+                <strong><i class="ti ti-alert-triangle"></i> Warning Disclaimer:</strong> Never perform blind finger sweeps on choking airways.
+              </div>
+            
+            {% elif item.content_type == 'video' %}
+              <div style="font-weight:600; color:var(--color-text-primary); margin-bottom:12px;">Video Details:</div>
+              <div style="background:#085041; height:180px; display:flex; align-items:center; justify-content:center; color:#fff; border-radius: var(--border-radius-md); margin-bottom:12px;">
+                <i class="ti ti-video" style="font-size: 40px;"></i>
+              </div>
+              <div class="info-row"><span class="info-label">Video URL</span><span class="info-val"><a href="{{ item.video_url }}" target="_blank">{{ item.video_url }}</a></span></div>
+              <div class="info-row"><span class="info-label">Duration</span><span class="info-val">{{ item.duration }}</span></div>
+              
+              {% if item.transcript %}
+                <div style="font-weight:600; color:var(--color-text-primary); margin:16px 0 6px;">Transcript:</div>
+                <div style="font-size:13px; color:var(--color-text-secondary); font-style:italic; line-height:1.6;">"{{ item.transcript }}"</div>
+              {% endif %}
+            
+            {% elif item.content_type == 'quiz' %}
+              <div style="font-weight:600; color:var(--color-text-primary); margin-bottom:12px;">Quiz Questions Preview:</div>
+              {% for q in item.questions %}
+                <div class="preview-question">
+                  <div class="preview-question-text">Q{{ loop.index }}: {{ q.question_text }}</div>
+                  <div class="preview-question-opts">
+                    A) {{ q.option_a }}<br>
+                    B) {{ q.option_b }}<br>
+                    C) {{ q.option_c }}<br>
+                    D) {{ q.option_d }}
+                  </div>
+                  <div style="font-size:11px; color:#0F6E56; font-weight:600; margin-top:6px;">Correct Answer: {{ q.correct_option }}</div>
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="review-panel">
+          <div class="review-box">
+            <div class="review-box-title">Submission details</div>
+            <div class="info-row"><span class="info-label">Submitted by</span><span class="info-val">Admin {{ item.author.first_name }}</span></div>
+            <div class="info-row"><span class="info-label">Content type</span><span class="info-val" style="text-transform: capitalize;">{{ item.content_type }}</span></div>
+            <div class="info-row"><span class="info-label">Species</span><span class="info-val">{{ item.species }}</span></div>
+            {% if item.severity %}
+              <div class="info-row"><span class="info-label">Severity</span><span class="info-val">{{ item.severity }}</span></div>
+            {% endif %}
+          </div>
+          
+          <form action="{{ url_for('vet_decision', content_id=item.id) }}" method="POST">
+            <div class="review-box">
+              <div class="review-box-title">Your feedback / notes</div>
+              <label class="form-label" style="font-size:11px; margin-bottom:8px;">Required if rejecting</label>
+              <textarea class="form-textarea" name="feedback" placeholder="e.g. Step 3 contains minor dosage errors — please revise..."></textarea>
+            </div>
+            
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;">
+              <button class="btn-approve" type="submit" name="decision" value="approve" style="width:100%;"><i class="ti ti-check" aria-hidden="true"></i> Approve and publish</button>
+              <button class="btn-reject" type="submit" name="decision" value="reject" style="width:100%;"><i class="ti ti-x" aria-hidden="true"></i> Reject with feedback</button>
+              <a href="{{ url_for('vet_pending') }}" class="btn-outline" style="width:100%;">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

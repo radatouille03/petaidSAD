@@ -1,0 +1,150 @@
+
+<style>
+  .screen-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; font-weight: 500; }
+  .screen { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 2rem; }
+  .nav { background: #0F6E56; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { color: #fff; font-size: 18px; font-weight: 500; }
+  .nav-links { display: flex; gap: 16px; }
+  .nav-link { color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer; }
+  .nav-btn { background: #fff; color: #0F6E56; border: none; border-radius: var(--border-radius-md); padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .hero { padding: 48px 32px; background: linear-gradient(135deg, #E1F5EE 0%, #fff 100%); text-align: center; }
+  .hero h1 { font-size: 32px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 12px; }
+  .hero p { color: var(--color-text-secondary); font-size: 15px; margin: 0 0 24px; }
+  .hero-btns { display: flex; gap: 12px; justify-content: center; }
+  .btn-primary { background: #0F6E56; color: #fff; border: none; border-radius: var(--border-radius-md); padding: 10px 24px; font-size: 14px; cursor: pointer; }
+  .btn-outline { background: transparent; color: #0F6E56; border: 1px solid #0F6E56; border-radius: var(--border-radius-md); padding: 10px 24px; font-size: 14px; cursor: pointer; }
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 32px; background: var(--color-background-secondary); }
+  .feature-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 20px; text-align: center; }
+  .feature-icon { font-size: 28px; color: #0F6E56; margin-bottom: 10px; }
+  .feature-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+  .feature-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  .form-screen { padding: 32px; max-width: 400px; margin: 0 auto; }
+  .form-title { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .form-sub { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 24px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 6px; display: block; }
+  .form-input { width: 100%; padding: 9px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 14px; background: var(--color-background-primary); color: var(--color-text-primary); box-sizing: border-box; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-submit { width: 100%; background: #0F6E56; color: #fff; border: none; border-radius: var(--border-radius-md); padding: 11px; font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 8px; }
+  .form-footer { text-align: center; font-size: 13px; color: var(--color-text-secondary); margin-top: 16px; }
+  .form-footer a { color: #0F6E56; text-decoration: none; }
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 20px 0; }
+  .error-msg { font-size: 12px; color: var(--color-text-danger); margin-top: 4px; }
+  .input-error { border-color: var(--color-border-danger) !important; }
+</style>
+
+<h2 class="sr-only">PetAid interface mockups showing home page, register page, and login page</h2>
+
+<p class="screen-label">Screen 1 — Home / Landing Page</p>
+<div class="screen">
+  <div class="nav">
+    <span class="nav-logo"><i class="ti ti-paw" aria-hidden="true"></i> PetAid</span>
+    <div class="nav-links">
+      <span class="nav-link">Home</span>
+      <span class="nav-link">About</span>
+      <span class="nav-link">Contact</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="nav-btn">Log in</button>
+      <button style="background:#5DCAA5;color:#fff;border:none;border-radius:var(--border-radius-md);padding:6px 14px;font-size:13px;font-weight:500;cursor:pointer;">Register</button>
+    </div>
+  </div>
+  <div class="hero">
+    <div style="display:inline-block;background:#E1F5EE;border-radius:999px;padding:6px 16px;font-size:12px;color:#0F6E56;margin-bottom:16px;">Your pet's safety, always within reach</div>
+    <h1>First-aid help for<br>your pets, anytime</h1>
+    <p>Quick access to trusted first-aid guides, videos and quizzes<br>for dogs, cats, rabbits, hamsters and more.</p>
+    <div class="hero-btns">
+      <button class="btn-primary"><i class="ti ti-search" aria-hidden="true"></i> Search Emergency</button>
+      <button class="btn-outline"><i class="ti ti-book" aria-hidden="true"></i> Browse Guides</button>
+    </div>
+  </div>
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ti ti-first-aid-kit" aria-hidden="true"></i></div>
+      <div class="feature-title">First-aid guides</div>
+      <div class="feature-desc">Step-by-step instructions for common pet emergencies</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ti ti-video" aria-hidden="true"></i></div>
+      <div class="feature-title">Educational videos</div>
+      <div class="feature-desc">Watch vet-approved videos to learn proper pet care</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
+      <div class="feature-title">Quizzes</div>
+      <div class="feature-desc">Test your knowledge and earn confidence in emergencies</div>
+    </div>
+  </div>
+</div>
+
+<p class="screen-label">Screen 2 — Register Page</p>
+<div class="screen">
+  <div class="nav">
+    <span class="nav-logo"><i class="ti ti-paw" aria-hidden="true"></i> PetAid</span>
+  </div>
+  <div class="form-screen">
+    <div class="form-title">Create your account</div>
+    <div class="form-sub">Join PetAid to access personalised first-aid content for your pets</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First name</label>
+        <input class="form-input" type="text" placeholder="John" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last name</label>
+        <input class="form-input" type="text" placeholder="Doe" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email address</label>
+      <input class="form-input" type="email" placeholder="john@email.com" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-input input-error" type="password" placeholder="Min. 8 characters" />
+      <div class="error-msg"><i class="ti ti-alert-circle" aria-hidden="true"></i> Password must be at least 8 characters</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirm password</label>
+      <input class="form-input" type="password" placeholder="Re-enter password" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Phone number (optional)</label>
+      <input class="form-input" type="tel" placeholder="+60 12 345 6789" />
+    </div>
+    <button class="form-submit">Create account</button>
+    <div class="form-footer">Already have an account? <a href="#">Log in</a></div>
+  </div>
+</div>
+
+<p class="screen-label">Screen 3 — Log In Page</p>
+<div class="screen">
+  <div class="nav">
+    <span class="nav-logo"><i class="ti ti-paw" aria-hidden="true"></i> PetAid</span>
+  </div>
+  <div class="form-screen">
+    <div class="form-title">Welcome back</div>
+    <div class="form-sub">Log in to access your pet profiles and saved content</div>
+    <div class="form-group">
+      <label class="form-label">Email address</label>
+      <input class="form-input" type="email" placeholder="john@email.com" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-input" type="password" placeholder="Enter your password" />
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+      <a href="#" style="font-size:13px;color:#0F6E56;text-decoration:none;">Forgot password?</a>
+    </div>
+    <button class="form-submit">Log in</button>
+    <hr class="divider" />
+    <div style="text-align:center;font-size:13px;color:var(--color-text-secondary);">
+      <div style="margin-bottom:12px;">Log in as</div>
+      <div style="display:flex;gap:8px;justify-content:center;">
+        <button style="border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);border-radius:var(--border-radius-md);padding:7px 16px;font-size:13px;cursor:pointer;"><i class="ti ti-shield" aria-hidden="true"></i> Administrator</button>
+        <button style="border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);border-radius:var(--border-radius-md);padding:7px 16px;font-size:13px;cursor:pointer;"><i class="ti ti-stethoscope" aria-hidden="true"></i> Vet Expert</button>
+      </div>
+    </div>
+    <div class="form-footer" style="margin-top:20px;">Don't have an account? <a href="#">Register</a></div>
+  </div>
+</div>

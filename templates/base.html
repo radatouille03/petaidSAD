@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PetAid — First Aid Management System{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Tabler Icons CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <!-- Local Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Flash Notifications -->
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category or 'info' }}">
+                        {% if category == 'success' %}
+                            <i class="ti ti-checkbox" aria-hidden="true"></i>
+                        {% elif category == 'danger' %}
+                            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+                        {% elif category == 'warning' %}
+                            <i class="ti ti-alert-circle" aria-hidden="true"></i>
+                        {% else %}
+                            <i class="ti ti-info-circle" aria-hidden="true"></i>
+                        {% endif %}
+                        <span>{{ message }}</span>
+                        <button class="flash-close" aria-label="Close message">
+                            <i class="ti ti-x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Navigation Header -->
+    {% set role = session.get('role') %}
+    {% if role == 'user' %}
+        <div class="nav" style="background: #0F6E56; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; color: #fff;">
+            <span class="nav-logo" style="color: #fff; font-size: 18px; font-weight: 500; cursor: pointer;" onclick="location.href='{{ url_for('dashboard') }}'">
+                <i class="ti ti-paw" aria-hidden="true"></i> PetAid
+            </span>
+            <div class="nav-links" style="display: flex; gap: 16px;">
+                <span class="nav-link" style="color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer;" onclick="location.href='{{ url_for('dashboard') }}'">Home</span>
+                <span class="nav-link" style="color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer;" onclick="location.href='{{ url_for('search_emergency') }}'">Search</span>
+                <span class="nav-link" style="color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer;" onclick="location.href='{{ url_for('guides_list') }}'">Guides</span>
+                <span class="nav-link" style="color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer;" onclick="location.href='{{ url_for('videos_list') }}'">Videos</span>
+                <span class="nav-link" style="color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer;" onclick="location.href='{{ url_for('quizzes_list') }}'">Quizzes</span>
+            </div>
+            <div class="nav-right" style="display: flex; align-items: center; gap: 12px;">
+                <span class="nav-user" style="color: #fff; font-size: 13px;"><i class="ti ti-user" aria-hidden="true"></i> {{ session.get('first_name') }} {{ session.get('last_name') }}</span>
+                <button class="nav-logout" style="background: rgba(255,255,255,0.15); color: #fff; border: none; border-radius: var(--border-radius-md); padding: 5px 12px; font-size: 13px; cursor: pointer;" onclick="location.href='{{ url_for('logout') }}'"><i class="ti ti-logout" aria-hidden="true"></i> Log out</button>
+            </div>
+        </div>
+    {% elif role == 'admin' %}
+        <div class="nav" style="background: #3C3489; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; color: #fff;">
+            <span class="nav-logo" style="color: #fff; font-size: 18px; font-weight: 500; cursor: pointer;" onclick="location.href='{{ url_for('admin_dashboard') }}'">
+                <i class="ti ti-paw" aria-hidden="true"></i> PetAid <span style="font-size:12px;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:999px;margin-left:6px;">Admin</span>
+            </span>
+            <div class="nav-right" style="display: flex; align-items: center; gap: 12px;">
+                <span class="nav-user" style="color: #fff; font-size: 13px;"><i class="ti ti-shield" aria-hidden="true"></i> Admin {{ session.get('first_name') }}</span>
+                <button class="nav-logout" style="background: rgba(255,255,255,0.15); color: #fff; border: none; border-radius: var(--border-radius-md); padding: 5px 12px; font-size: 13px; cursor: pointer;" onclick="location.href='{{ url_for('logout') }}'"><i class="ti ti-logout" aria-hidden="true"></i> Log out</button>
+            </div>
+        </div>
+    {% elif role == 'vet' %}
+        <div class="nav" style="background: #085041; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; color: #fff;">
+            <span class="nav-logo" style="color: #fff; font-size: 18px; font-weight: 500; cursor: pointer;" onclick="location.href='{{ url_for('vet_dashboard') }}'">
+                <i class="ti ti-paw" aria-hidden="true"></i> PetAid <span style="font-size:12px;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:999px;margin-left:6px;">Vet Expert</span>
+            </span>
+            <div class="nav-right" style="display: flex; align-items: center; gap: 12px;">
+                <span class="nav-user" style="color: #fff; font-size: 13px;"><i class="ti ti-stethoscope" aria-hidden="true"></i> {{ session.get('first_name') }} {{ session.get('last_name') }}</span>
+                <button class="nav-logout" style="background: rgba(255,255,255,0.15); color: #fff; border: none; border-radius: var(--border-radius-md); padding: 5px 12px; font-size: 13px; cursor: pointer;" onclick="location.href='{{ url_for('logout') }}'"><i class="ti ti-logout" aria-hidden="true"></i> Log out</button>
+            </div>
+        </div>
+    {% else %}
+        <!-- Public Header -->
+        <div class="nav" style="background: #0F6E56; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; color: #fff;">
+            <span class="nav-logo" style="color: #fff; font-size: 18px; font-weight: 500; cursor: pointer;" onclick="location.href='{{ url_for('home') }}'">
+                <i class="ti ti-paw" aria-hidden="true"></i> PetAid
+            </span>
+            <div style="display:flex;gap:8px">
+                <button class="nav-btn" style="background: #fff; color: #0F6E56; border: none; border-radius: var(--border-radius-md); padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;" onclick="location.href='{{ url_for('login_route') }}'">Log in</button>
+                <button style="background:#5DCAA5;color:#fff;border:none;border-radius:var(--border-radius-md);padding:6px 14px;font-size:13px;font-weight:500;cursor:pointer;" onclick="location.href='{{ url_for('register_route') }}'">Register</button>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Page Body Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Javascript fade-out and close for flash alerts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const alerts = document.querySelectorAll('.flash-message');
+            alerts.forEach(alert => {
+                // Setup auto-dismiss
+                const autoFade = setTimeout(() => {
+                    dismissAlert(alert);
+                }, 4000);
+
+                // Setup close button click listener
+                const closeBtn = alert.querySelector('.flash-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        clearTimeout(autoFade);
+                        dismissAlert(alert);
+                    });
+                }
+            });
+
+            function dismissAlert(alert) {
+                alert.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-10px)';
+                setTimeout(() => alert.remove(), 500);
+            }
+        });
+    </script>
+</body>
+</html>

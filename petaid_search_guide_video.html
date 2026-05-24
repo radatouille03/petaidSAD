@@ -1,0 +1,314 @@
+
+<style>
+  .screen-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; font-weight: 500; }
+  .screen { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 2rem; }
+  .nav { background: #0F6E56; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { color: #fff; font-size: 18px; font-weight: 500; }
+  .nav-links { display: flex; gap: 16px; }
+  .nav-link { color: rgba(255,255,255,0.85); font-size: 13px; cursor: pointer; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-user { color: #fff; font-size: 13px; }
+  .nav-logout { background: rgba(255,255,255,0.15); color: #fff; border: none; border-radius: var(--border-radius-md); padding: 5px 12px; font-size: 13px; cursor: pointer; }
+  .layout { display: grid; grid-template-columns: 200px 1fr; min-height: 500px; }
+  .sidebar { background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); padding: 20px 0; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; }
+  .sidebar-item.active { background: #E1F5EE; color: #0F6E56; font-weight: 500; border-right: 2px solid #0F6E56; }
+  .sidebar-item i { font-size: 16px; }
+  .main { padding: 24px; }
+  .page-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 24px; }
+  .search-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+  .search-input { flex: 1; padding: 10px 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 14px; background: var(--color-background-primary); color: var(--color-text-primary); }
+  .search-btn { background: #0F6E56; color: #fff; border: none; border-radius: var(--border-radius-md); padding: 10px 20px; font-size: 13px; cursor: pointer; }
+  .filter-row { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filter-chip { padding: 5px 14px; border-radius: 999px; font-size: 12px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; }
+  .filter-chip.active { background: #0F6E56; color: #fff; border-color: #0F6E56; }
+  .results-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .result-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px; cursor: pointer; }
+  .result-card:hover { border-color: #0F6E56; }
+  .result-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .result-icon { width: 36px; height: 36px; border-radius: var(--border-radius-md); background: #E1F5EE; display: flex; align-items: center; justify-content: center; color: #0F6E56; font-size: 16px; flex-shrink: 0; }
+  .result-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); line-height: 1.4; }
+  .result-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; margin-top: 8px; }
+  .badge-red { background: #FCEBEB; color: #A32D2D; }
+  .badge-amber { background: #FAEEDA; color: #854F0B; }
+  .badge-green { background: #E1F5EE; color: #0F6E56; }
+  .guide-header { background: #E1F5EE; padding: 20px 24px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .guide-title { font-size: 18px; font-weight: 500; color: #085041; margin-bottom: 6px; }
+  .guide-meta { display: flex; gap: 16px; font-size: 12px; color: #0F6E56; }
+  .guide-body { padding: 24px; display: grid; grid-template-columns: 1fr 280px; gap: 24px; }
+  .steps-list { display: flex; flex-direction: column; gap: 16px; }
+  .step { display: flex; gap: 14px; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: #0F6E56; color: #fff; font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .step-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+  .guide-sidebar { display: flex; flex-direction: column; gap: 12px; }
+  .info-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px; }
+  .info-box-title { font-size: 12px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+  .info-box-content { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+  .warning-box { background: #FCEBEB; border-radius: var(--border-radius-md); padding: 14px; border-left: 3px solid #A32D2D; }
+  .warning-title { font-size: 12px; font-weight: 500; color: #A32D2D; margin-bottom: 6px; }
+  .warning-content { font-size: 12px; color: #A32D2D; line-height: 1.6; }
+  .video-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .video-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; cursor: pointer; }
+  .video-thumb { background: #085041; height: 120px; display: flex; align-items: center; justify-content: center; position: relative; }
+  .play-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; color: #0F6E56; font-size: 18px; }
+  .video-duration { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.6); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; }
+  .video-info { padding: 12px; }
+  .video-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; line-height: 1.4; }
+  .video-meta { font-size: 11px; color: var(--color-text-secondary); }
+  .video-player { background: #085041; height: 280px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
+  .video-controls { background: var(--color-background-secondary); padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+  .progress-bar { flex: 1; height: 4px; background: var(--color-border-tertiary); border-radius: 2px; position: relative; }
+  .progress-fill { width: 35%; height: 100%; background: #0F6E56; border-radius: 2px; }
+  .ctrl-btn { background: none; border: none; color: var(--color-text-secondary); font-size: 18px; cursor: pointer; }
+</style>
+
+<h2 class="sr-only">PetAid search emergency, view first-aid guide, and watch video screens</h2>
+
+<p class="screen-label">Screen 7 — Search Emergency Case</p>
+<div class="screen">
+  <div class="nav">
+    <span class="nav-logo"><i class="ti ti-paw" aria-hidden="true"></i> PetAid</span>
+    <div class="nav-right">
+      <span class="nav-user"><i class="ti ti-user" aria-hidden="true"></i> John Doe</span>
+      <button class="nav-logout"><i class="ti ti-logout" aria-hidden="true"></i> Log out</button>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-item"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="sidebar-item"><i class="ti ti-user"></i> My Profile</div>
+      <div class="sidebar-item"><i class="ti ti-paw"></i> My Pets</div>
+      <div class="sidebar-item active"><i class="ti ti-search"></i> Search Emergency</div>
+      <div class="sidebar-item"><i class="ti ti-book"></i> First-aid Guides</div>
+      <div class="sidebar-item"><i class="ti ti-video"></i> Videos</div>
+      <div class="sidebar-item"><i class="ti ti-clipboard-check"></i> Quizzes</div>
+    </div>
+    <div class="main">
+      <div class="page-title">Search Emergency Case</div>
+      <div class="page-sub">Search by symptom, keyword or pet type</div>
+      <div class="search-bar">
+        <input class="search-input" type="text" placeholder="e.g. choking, seizure, bleeding..." value="choking" />
+        <button class="search-btn"><i class="ti ti-search" aria-hidden="true"></i> Search</button>
+      </div>
+      <div class="filter-row">
+        <span style="font-size:12px;color:var(--color-text-secondary);padding:5px 0;">Filter by pet:</span>
+        <span class="filter-chip active">All</span>
+        <span class="filter-chip">Dog</span>
+        <span class="filter-chip">Cat</span>
+        <span class="filter-chip">Rabbit</span>
+        <span class="filter-chip">Hamster</span>
+      </div>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px;">4 results for "choking"</div>
+      <div class="results-grid">
+        <div class="result-card">
+          <div class="result-header">
+            <div class="result-icon"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div>
+            <div class="result-title">What to do if your dog is choking</div>
+          </div>
+          <div class="result-desc">Step-by-step guide to clear airway obstruction in dogs safely and quickly.</div>
+          <span class="badge badge-red">Critical</span>
+        </div>
+        <div class="result-card">
+          <div class="result-header">
+            <div class="result-icon"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div>
+            <div class="result-title">Cat choking — signs and immediate response</div>
+          </div>
+          <div class="result-desc">Recognise choking symptoms in cats and apply the correct first-aid response.</div>
+          <span class="badge badge-red">Critical</span>
+        </div>
+        <div class="result-card">
+          <div class="result-header">
+            <div class="result-icon"><i class="ti ti-info-circle" aria-hidden="true"></i></div>
+            <div class="result-title">Rabbit choking on food — what to do</div>
+          </div>
+          <div class="result-desc">How to identify and respond to a rabbit choking on food or a foreign object.</div>
+          <span class="badge badge-amber">Moderate</span>
+        </div>
+        <div class="result-card">
+          <div class="result-header">
+            <div class="result-icon"><i class="ti ti-info-circle" aria-hidden="true"></i></div>
+            <div class="result-title">Hamster choking prevention and response</div>
+          </div>
+          <div class="result-desc">Tips to prevent choking in hamsters and what to do if it occurs.</div>
+          <span class="badge badge-amber">Moderate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="screen-label">Screen 8 — View First-Aid Guide</p>
+<div class="screen">
+  <div class="nav">
+    <span class="nav-logo"><i class="ti ti-paw" aria-hidden="true"></i> PetAid</span>
+    <div class="nav-right">
+      <span class="nav-user"><i class="ti ti-user" aria-hidden="true"></i> John Doe</span>
+      <button class="nav-logout"><i class="ti ti-logout" aria-hidden="true"></i> Log out</button>
+    </div>
+  </div>
+  <div class="guide-header">
+    <div style="font-size:12px;color:#0F6E56;margin-bottom:6px;"><i class="ti ti-arrow-left" aria-hidden="true"></i> Back to search results</div>
+    <div class="guide-title">What to do if your dog is choking</div>
+    <div class="guide-meta">
+      <span><i class="ti ti-paw" aria-hidden="true"></i> Dog</span>
+      <span><i class="ti ti-alert-triangle" aria-hidden="true"></i> Critical</span>
+      <span><i class="ti ti-clock" aria-hidden="true"></i> 3 min read</span>
+      <span><i class="ti ti-shield-check" aria-hidden="true"></i> Verified by vet</span>
+    </div>
+  </div>
+  <div class="guide-body">
+    <div>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:16px;line-height:1.6;">Choking in dogs is a life-threatening emergency. Act quickly but stay calm. Follow these steps immediately.</div>
+      <div class="steps-list">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Stay calm and restrain your dog</div>
+            <div class="step-desc">A choking dog may panic and bite. Speak calmly and gently hold your dog still before attempting anything.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Check the mouth</div>
+            <div class="step-desc">Open the mouth carefully and look inside. If you can clearly see and safely reach the object, try to remove it with two fingers. Do not do a blind finger sweep.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Apply back blows</div>
+            <div class="step-desc">Tilt the dog forward and give up to 5 firm blows between the shoulder blades using the heel of your hand.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Apply abdominal thrusts</div>
+            <div class="step-desc">Stand behind your dog, make a fist and place it just below the rib cage. Pull sharply inward and upward up to 5 times.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-title">Call a vet immediately</div>
+            <div class="step-desc">Even if the object is removed, take your dog to a vet right away to check for internal damage.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="guide-sidebar">
+      <div class="warning-box">
+        <div class="warning-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Warning</div>
+        <div class="warning-content">Never do a blind finger sweep — this can push the object further down the throat.</div>
+      </div>
+      <div class="info-box">
+        <div class="info-box-title">Applies to</div>
+        <div class="info-box-content">All dog breeds and sizes. Adjust pressure based on the dog's size.</div>
+      </div>
+      <div class="info-box">
+        <div class="info-box-title">Related guides</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+          <div style="font-size:12px;color:#0F6E56;cursor:pointer;">Cat choking — signs and response</div>
+          <div style="font-size:12px;color:#0F6E56;cursor:pointer;">Dog CPR basics</div>
+          <div style="font-size:12px;color:#0F6E56;cursor:pointer;">Recognising breathing difficulties</div>
+        </div>
+      </div>
+      <div class="info-box">
+        <div class="info-box-title">Related video</div>
+        <div style="background:#085041;border-radius:var(--border-radius-md);height:80px;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:4px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;color:#0F6E56;font-size:16px;"><i class="ti ti-player-play" aria-hidden="true"></i></div>
+        </div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:6px;">Dog choking — visual guide (4:32)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="screen-label">Screen 9 — Watch Educational Video</p>
+<div class="screen">
+  <div class="nav">
+    <span class="nav-logo"><i class="ti ti-paw" aria-hidden="true"></i> PetAid</span>
+    <div class="nav-right">
+      <span class="nav-user"><i class="ti ti-user" aria-hidden="true"></i> John Doe</span>
+      <button class="nav-logout"><i class="ti ti-logout" aria-hidden="true"></i> Log out</button>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-item"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="sidebar-item"><i class="ti ti-user"></i> My Profile</div>
+      <div class="sidebar-item"><i class="ti ti-paw"></i> My Pets</div>
+      <div class="sidebar-item"><i class="ti ti-search"></i> Search Emergency</div>
+      <div class="sidebar-item"><i class="ti ti-book"></i> First-aid Guides</div>
+      <div class="sidebar-item active"><i class="ti ti-video"></i> Videos</div>
+      <div class="sidebar-item"><i class="ti ti-clipboard-check"></i> Quizzes</div>
+    </div>
+    <div class="main" style="padding:0;">
+      <div class="video-player">
+        <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;"><i class="ti ti-player-play" aria-hidden="true"></i></div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.7);">Dog choking — visual guide</div>
+      </div>
+      <div class="video-controls">
+        <button class="ctrl-btn"><i class="ti ti-player-play" aria-hidden="true"></i></button>
+        <span style="font-size:12px;color:var(--color-text-secondary);">1:34</span>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+        <span style="font-size:12px;color:var(--color-text-secondary);">4:32</span>
+        <button class="ctrl-btn"><i class="ti ti-volume" aria-hidden="true"></i></button>
+      </div>
+      <div style="padding:16px 20px;border-bottom:0.5px solid var(--color-border-tertiary);">
+        <div style="font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;">Dog choking — visual guide</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);">Dog • Critical • 4:32 • Verified by vet</div>
+      </div>
+      <div style="padding:16px 20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:12px;">More videos</div>
+        <div class="video-grid">
+          <div class="video-card">
+            <div class="video-thumb">
+              <div class="play-btn"><i class="ti ti-player-play" aria-hidden="true"></i></div>
+              <span class="video-duration">3:15</span>
+            </div>
+            <div class="video-info">
+              <div class="video-title">Cat choking — signs and response</div>
+              <div class="video-meta">Cat • Critical</div>
+            </div>
+          </div>
+          <div class="video-card">
+            <div class="video-thumb">
+              <div class="play-btn"><i class="ti ti-player-play" aria-hidden="true"></i></div>
+              <span class="video-duration">5:48</span>
+            </div>
+            <div class="video-info">
+              <div class="video-title">Dog CPR — step by step</div>
+              <div class="video-meta">Dog • Critical</div>
+            </div>
+          </div>
+          <div class="video-card">
+            <div class="video-thumb">
+              <div class="play-btn"><i class="ti ti-player-play" aria-hidden="true"></i></div>
+              <span class="video-duration">2:50</span>
+            </div>
+            <div class="video-info">
+              <div class="video-title">How to handle a rabbit seizure</div>
+              <div class="video-meta">Rabbit • Moderate</div>
+            </div>
+          </div>
+          <div class="video-card">
+            <div class="video-thumb">
+              <div class="play-btn"><i class="ti ti-player-play" aria-hidden="true"></i></div>
+              <span class="video-duration">4:10</span>
+            </div>
+            <div class="video-info">
+              <div class="video-title">Wound care for cats and dogs</div>
+              <div class="video-meta">Dog, Cat • Moderate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

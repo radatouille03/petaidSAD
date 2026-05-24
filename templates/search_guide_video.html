@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}PetAid — Emergency Help{% endblock %}
+
+{% block content %}
+<style>
+  .layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 54px); }
+  .sidebar { background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); padding: 20px 0; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 12px 20px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; text-decoration: none; transition: all 0.2s; }
+  .sidebar-item:hover { background: #F3F4F6; color: var(--color-text-primary); }
+  .sidebar-item.active { background: #E1F5EE; color: #0F6E56; font-weight: 600; border-right: 3px solid #0F6E56; }
+  .sidebar-item i { font-size: 16px; }
+  
+  .main { padding: 32px; background: #FFFFFF; }
+  .page-title { font-size: 22px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 6px; }
+  .page-sub { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 24px; }
+  
+  /* Search components */
+  .search-bar { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; }
+  .search-input { flex: 1; padding: 12px 16px; border: 1.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 14px; background: var(--color-background-primary); color: var(--color-text-primary); outline: none; transition: border-color 0.2s; }
+  .search-input:focus { border-color: #0F6E56; }
+  .search-btn { background: #0F6E56; color: #fff; border: none; border-radius: var(--border-radius-md); padding: 12px 24px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+  .search-btn:hover { background: #0b503e; }
+  
+  /* Strategy Selector styling */
+  .strategy-select { padding: 11px 16px; border: 1.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 13px; font-weight: 500; background: var(--color-background-primary); color: var(--color-text-primary); outline: none; cursor: pointer; }
+  .strategy-select:focus { border-color: #0F6E56; }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+  .filter-chip { padding: 6px 16px; border-radius: 999px; font-size: 12px; font-weight: 500; border: 1px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.2s; text-decoration: none; }
+  .filter-chip.active { background: #0F6E56; color: #fff; border-color: #0F6E56; }
+  
+  /* Results Grid */
+  .results-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .result-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 20px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+  .result-card:hover { border-color: #0F6E56; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+  .result-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+  .result-icon { width: 40px; height: 40px; border-radius: var(--border-radius-md); background: #E1F5EE; display: flex; align-items: center; justify-content: center; color: #0F6E56; font-size: 18px; flex-shrink: 0; }
+  .result-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); line-height: 1.4; }
+  .result-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 12px; }
+  
+  /* Badges */
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+  .badge-red { background: #FCEBEB; color: #A32D2D; }
+  .badge-amber { background: #FAEEDA; color: #854F0B; }
+  .badge-green { background: #E1F5EE; color: #0F6E56; }
+  .badge-gray { background: var(--color-border-tertiary); color: var(--color-text-secondary); }
+
+  /* Guide Header & Body */
+  .guide-header { background: #E1F5EE; padding: 24px 32px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .guide-title { font-size: 22px; font-weight: 600; color: #085041; margin-bottom: 8px; }
+  .guide-meta { display: flex; gap: 20px; font-size: 12px; color: #0F6E56; font-weight: 500; }
+  .guide-meta span { display: flex; align-items: center; gap: 6px; }
+  .guide-body { padding: 32px; display: grid; grid-template-columns: 1fr 280px; gap: 32px; }
+  
+  .steps-list { display: flex; flex-direction: column; gap: 20px; }
+  .step { display: flex; gap: 16px; }
+  .step-num { width: 32px; height: 32px; border-radius: 50%; background: #0F6E56; color: #fff; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 6px; }
+  .step-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+  
+  .guide-sidebar { display: flex; flex-direction: column; gap: 16px; }
+  .info-box { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 18px; }
+  .info-box-title { font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .info-box-content { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+  .warning-box { background: #FCEBEB; border-radius: var(--border-radius-lg); padding: 18px; border-left: 4px solid #A32D2D; }
+  .warning-title { font-size: 12px; font-weight: 600; color: #A32D2D; margin-bottom: 8px; text-transform: uppercase; }
+  .warning-content { font-size: 13px; color: #A32D2D; line-height: 1.6; }
+
+  /* Video Layout */
+  .video-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .video-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; cursor: pointer; text-decoration: none; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: all 0.2s; }
+  .video-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+  .video-thumb { background: #085041; height: 130px; display: flex; align-items: center; justify-content: center; position: relative; }
+  .play-btn { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; color: #0F6E56; font-size: 20px; }
+  .video-duration { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+  .video-info { padding: 14px; }
+  .video-title { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 6px; line-height: 1.4; }
+  .video-meta { font-size: 11px; color: var(--color-text-secondary); }
+
+  .video-player { background: #085041; height: 360px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; border-radius: var(--border-radius-lg); margin-bottom: 16px; position: relative; overflow: hidden; }
+  .video-controls { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .progress-bar { flex: 1; height: 6px; background: var(--color-border-tertiary); border-radius: 3px; position: relative; cursor: pointer; }
+  .progress-fill { width: 35%; height: 100%; background: #0F6E56; border-radius: 3px; }
+  .ctrl-btn { background: none; border: none; color: var(--color-text-secondary); font-size: 20px; cursor: pointer; display: flex; align-items: center; }
+</style>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="{{ url_for('dashboard') }}" class="sidebar-item"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+    <a href="{{ url_for('profile') }}" class="sidebar-item"><i class="ti ti-user"></i> My Profile</a>
+    <a href="{{ url_for('pets_list') }}" class="sidebar-item"><i class="ti ti-paw"></i> My Pets</a>
+    <a href="{{ url_for('search_emergency') }}" class="sidebar-item {% if active_tab == 'search' %}active{% endif %}"><i class="ti ti-search"></i> Search Emergency</a>
+    <a href="{{ url_for('guides_list') }}" class="sidebar-item {% if active_tab == 'guides' %}active{% endif %}"><i class="ti ti-book"></i> First-aid Guides</a>
+    <a href="{{ url_for('videos_list') }}" class="sidebar-item {% if active_tab == 'videos' %}active{% endif %}"><i class="ti ti-video"></i> Videos</a>
+    <a href="{{ url_for('quizzes_list') }}" class="sidebar-item"><i class="ti ti-clipboard-check"></i> Quizzes</a>
+  </div>
+
+  <div class="main" style="{% if active_tab == 'guides' and guide %}padding:0;{% endif %}">
+    {% if active_tab == 'search' %}
+      <!-- Screen 7 — Search Emergency Case -->
+      <div class="page-title">Search Emergency Case</div>
+      <div class="page-sub">Search by symptom, keyword or pet type</div>
+      
+      <form action="{{ url_for('search_emergency') }}" method="GET">
+        <div class="search-bar">
+          <input class="search-input" type="text" name="query" placeholder="e.g. choking, seizure, bleeding..." value="{{ query or '' }}" />
+          
+          <!-- Strategy selector: swappable search engine patterns -->
+          <label style="font-size:12px; font-weight:600; color:var(--color-text-secondary); margin-left:8px;">Strategy:</label>
+          <select class="strategy-select" name="strategy">
+            <option value="keyword" {% if strategy_mode == 'keyword' %}selected{% endif %}>Keyword Matching</option>
+            <option value="severity" {% if strategy_mode == 'severity' %}selected{% endif %}>Severity & Species Order</option>
+          </select>
+          
+          <button class="search-btn" type="submit"><i class="ti ti-search" aria-hidden="true"></i> Search</button>
+        </div>
+        
+        <div class="filter-row">
+          <span style="font-size:13px;color:var(--color-text-secondary);margin-right:8px;font-weight:500;">Filter by pet:</span>
+          <!-- Dynamic species links -->
+          <a href="{{ url_for('search_emergency', query=query, species='all', strategy=strategy_mode) }}" class="filter-chip {% if active_species == 'all' %}active{% endif %}">All</a>
+          <a href="{{ url_for('search_emergency', query=query, species='Dog', strategy=strategy_mode) }}" class="filter-chip {% if active_species == 'Dog' %}active{% endif %}">Dog</a>
+          <a href="{{ url_for('search_emergency', query=query, species='Cat', strategy=strategy_mode) }}" class="filter-chip {% if active_species == 'Cat' %}active{% endif %}">Cat</a>
+          <a href="{{ url_for('search_emergency', query=query, species='Rabbit', strategy=strategy_mode) }}" class="filter-chip {% if active_species == 'Rabbit' %}active{% endif %}">Rabbit</a>
+          <a href="{{ url_for('search_emergency', query=query, species='Hamster', strategy=strategy_mode) }}" class="filter-chip {% if active_species == 'Hamster' %}active{% endif %}">Hamster</a>
+        </div>
+      </form>
+      
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:16px;font-weight:500;">{{ results|length }} result(s) found</div>
+      
+      <div class="results-grid">
+        {% for case in results %}
+          <a href="{% if case.guide_id %}{{ url_for('view_guide', guide_id=case.guide_id) }}{% elif case.video_id %}{{ url_for('view_video', video_id=case.video_id) }}{% else %}#{% endif %}" class="result-card">
+            <div class="result-header">
+              <div class="result-icon">
+                {% if case.severity == 'Critical' %}
+                  <i class="ti ti-alert-triangle" aria-hidden="true" style="color:#A32D2D;"></i>
+                {% else %}
+                  <i class="ti ti-info-circle" aria-hidden="true" style="color:#854F0B;"></i>
+                {% endif %}
+              </div>
+              <div class="result-title">{{ case.title }}</div>
+            </div>
+            <div class="result-desc">{{ case.description }}</div>
+            <span class="badge {% if case.severity == 'Critical' %}badge-red{% elif case.severity == 'Moderate' %}badge-amber{% else %}badge-green{% endif %}">{{ case.severity }}</span>
+            <span class="badge badge-gray" style="margin-left: 6px;">{{ case.species }}</span>
+          </a>
+        {% else %}
+          <div style="grid-column: 1 / -1; text-align:center; padding:48px; color:var(--color-text-secondary);">
+            <i class="ti ti-search-off" style="font-size: 32px; display:block; margin-bottom:12px;"></i>
+            No emergency cases match your search term. Try "choking" or "seizure".
+          </div>
+        {% endfor %}
+      </div>
+
+    {% elif active_tab == 'guides' %}
+      {% if guide %}
+        <!-- Screen 8 — View First-Aid Guide -->
+        <div class="guide-header">
+          <div style="font-size:13px;color:#0F6E56;margin-bottom:8px;cursor:pointer;font-weight:600;" onclick="location.href='{{ url_for('search_emergency') }}'"><i class="ti ti-arrow-left" aria-hidden="true"></i> Back to search results</div>
+          <div class="guide-title">{{ guide.title }}</div>
+          <div class="guide-meta">
+            <span><i class="ti ti-paw" aria-hidden="true"></i> {{ guide.species }}</span>
+            <span><i class="ti ti-alert-triangle" aria-hidden="true"></i> {{ guide.severity }}</span>
+            <span><i class="ti ti-clock" aria-hidden="true"></i> 3 min read</span>
+            <span><i class="ti ti-shield-check" aria-hidden="true"></i> Verified by vet</span>
+          </div>
+        </div>
+        
+        <div class="guide-body">
+          <div>
+            <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:24px;line-height:1.6;">{{ guide.description }}</div>
+            
+            <div class="steps-list">
+              {% for step in guide.steps %}
+                <div class="step">
+                  <div class="step-num">{{ step.step_number }}</div>
+                  <div class="step-content">
+                    <div class="step-title">{{ step.title }}</div>
+                    <div class="step-desc">{{ step.description }}</div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          
+          <div class="guide-sidebar">
+            <div class="warning-box">
+              <div class="warning-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Warning / Disclaimer</div>
+              <div class="warning-content">Never perform a blind finger sweep on a choking pet, as you risk pushing the obstruction deeper down the throat.</div>
+            </div>
+            
+            <div class="info-box">
+              <div class="info-box-title">Applies to</div>
+              <div class="info-box-content">All {{ guide.species.lower() }} breeds and sizes. Adjust forces and pressures based on your pet's physical stature.</div>
+            </div>
+            
+            <div class="info-box">
+              <div class="info-box-title">Related guides</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
+                {% for related in related_guides %}
+                  <a href="{{ url_for('view_guide', guide_id=related.id) }}" style="font-size:12px;color:#0F6E56;text-decoration:none;font-weight:600;">{{ related.title }}</a>
+                {% endfor %}
+              </div>
+            </div>
+            
+            {% if related_video %}
+              <div class="info-box">
+                <div class="info-box-title">Related video</div>
+                <a href="{{ url_for('view_video', video_id=related_video.id) }}" style="background:#085041;border-radius:var(--border-radius-md);height:90px;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:6px;position:relative;text-decoration:none;color:#fff;">
+                  <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;color:#0F6E56;font-size:18px;"><i class="ti ti-player-play" aria-hidden="true"></i></div>
+                  <span style="position:absolute; bottom:6px; right:6px; font-size:10px; background:rgba(0,0,0,0.6); padding:2px 6px; border-radius:4px;">{{ related_video.duration }}</span>
+                </a>
+                <div style="font-size:12px;color:var(--color-text-secondary);margin-top:8px;font-weight:500;">{{ related_video.title }}</div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% else %}
+        <!-- Browse Guides List -->
+        <div class="page-title">First-aid Guides</div>
+        <div class="page-sub">Browse clinical guides approved by veterinary experts</div>
+        <div class="results-grid">
+          {% for g in guides %}
+            <a href="{{ url_for('view_guide', guide_id=g.id) }}" class="result-card">
+              <div class="result-header">
+                <div class="result-icon"><i class="ti ti-book" aria-hidden="true"></i></div>
+                <div class="result-title">{{ g.title }}</div>
+              </div>
+              <div class="result-desc">{{ g.description }}</div>
+              <span class="badge {% if g.severity == 'Critical' %}badge-red{% elif g.severity == 'Moderate' %}badge-amber{% else %}badge-green{% endif %}">{{ g.severity }}</span>
+              <span class="badge badge-gray" style="margin-left: 6px;">{{ g.species }}</span>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+    {% elif active_tab == 'videos' %}
+      {% if video %}
+        <!-- Screen 9 — Watch Educational Video -->
+        <div style="padding: 24px;">
+          <div style="font-size:13px;color:#0F6E56;margin-bottom:12px;cursor:pointer;font-weight:600;" onclick="location.href='{{ url_for('videos_list') }}'"><i class="ti ti-arrow-left" aria-hidden="true"></i> Back to video library</div>
+          
+          <!-- Mock/Embedded Video Player -->
+          <div class="video-player">
+            <i class="ti ti-player-play" style="font-size:56px;color:rgba(255,255,255,0.7);cursor:pointer;"></i>
+            <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:500;">{{ video.title }}</div>
+          </div>
+          
+          <div class="video-controls">
+            <button class="ctrl-btn"><i class="ti ti-player-play" aria-hidden="true"></i></button>
+            <span style="font-size:12px;color:var(--color-text-secondary); font-weight:500;">1:34</span>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+            <span style="font-size:12px;color:var(--color-text-secondary); font-weight:500;">{{ video.duration }}</span>
+            <button class="ctrl-btn"><i class="ti ti-volume" aria-hidden="true"></i></button>
+          </div>
+          
+          <div style="padding:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:24px;">
+            <div style="font-size:18px;font-weight:600;color:var(--color-text-primary);margin-bottom:6px;">{{ video.title }}</div>
+            <div style="font-size:13px;color:var(--color-text-secondary); font-weight:500;">{{ video.species }} • {{ video.severity }} • Verified by vet</div>
+            
+            {% if video.transcript %}
+              <div style="border-top: 0.5px solid var(--color-border-secondary); margin-top:16px; padding-top:16px;">
+                <div style="font-size:12px; font-weight:600; color:var(--color-text-primary); text-transform:uppercase; margin-bottom:8px;">Transcript</div>
+                <div style="font-size:13px; color:var(--color-text-secondary); line-height:1.6; font-style:italic;">"{{ video.transcript }}"</div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% else %}
+        <!-- Browse Videos Library -->
+        <div class="page-title">Educational Videos</div>
+        <div class="page-sub">Watch vet-approved demonstrations to acquire proper first-aid habits</div>
+        <div class="results-grid">
+          {% for v in videos %}
+            <a href="{{ url_for('view_video', video_id=v.id) }}" class="result-card" style="padding:0;">
+              <div class="video-thumb">
+                <div class="play-btn"><i class="ti ti-player-play" aria-hidden="true"></i></div>
+                <span class="video-duration">{{ v.duration }}</span>
+              </div>
+              <div class="video-info">
+                <div class="video-title">{{ v.title }}</div>
+                <div class="video-meta">{{ v.species }} • {{ v.severity }}</div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

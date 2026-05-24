@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+
+{% block title %}PetAid — Home{% endblock %}
+
+{% block content %}
+<style>
+  .screen {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    max-width: 960px;
+    margin: 2rem auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Hero section styling */
+  .hero {
+    padding: 64px 32px;
+    background: linear-gradient(135deg, #E1F5EE 0%, #fff 100%);
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 16px;
+    line-height: 1.2;
+  }
+
+  .hero p {
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    margin: 0 0 28px;
+    line-height: 1.6;
+  }
+
+  .hero-btns {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background: #0F6E56;
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius-md);
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .btn-primary:hover {
+    background: #0b503e;
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: #0F6E56;
+    border: 1.5px solid #0F6E56;
+    border-radius: var(--border-radius-md);
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .btn-outline:hover {
+    background: #E1F5EE;
+  }
+
+  /* Feature grid styling */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 40px 32px;
+    background: var(--color-background-secondary);
+    border-top: 0.5px solid var(--color-border-tertiary);
+  }
+
+  .feature-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  }
+
+  .feature-icon {
+    font-size: 32px;
+    color: #0F6E56;
+    margin-bottom: 12px;
+  }
+
+  .feature-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+  }
+
+  .feature-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+  }
+
+  /* Form layouts */
+  .form-screen {
+    padding: 40px 32px;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  .form-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 6px;
+  }
+
+  .form-sub {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin-bottom: 28px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .form-label {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 500;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    font-size: 14px;
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus {
+    border-color: #0F6E56;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-submit {
+    width: 100%;
+    background: #0F6E56;
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius-md);
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s;
+  }
+
+  .form-submit:hover {
+    background: #0b503e;
+  }
+
+  .form-footer {
+    text-align: center;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-top: 20px;
+  }
+
+  .form-footer a {
+    color: #0F6E56;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .divider {
+    border: none;
+    border-top: 0.5px solid var(--color-border-tertiary);
+    margin: 24px 0;
+  }
+
+  .error-msg {
+    font-size: 12px;
+    color: var(--color-text-danger);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .input-error {
+    border-color: var(--color-text-danger) !important;
+  }
+</style>
+
+<div class="screen">
+  {% if active_view == 'home' %}
+  <!-- Screen 1 — Home / Landing Page -->
+  <div class="hero">
+    <div
+      style="display:inline-block;background:#E1F5EE;border-radius:999px;padding:6px 18px;font-size:12px;color:#0F6E56;margin-bottom:20px;font-weight:600;">
+      Your pet's safety, always within reach</div>
+    <h1>First-aid help for<br>your pets, anytime</h1>
+    <p>Quick access to trusted first-aid guides, videos and quizzes<br>for dogs, cats, rabbits, hamsters and more.</p>
+    <div class="hero-btns">
+      <a href="{{ url_for('search_emergency') }}" class="btn-primary"><i class="ti ti-search" aria-hidden="true"></i>
+        Search Emergency</a>
+      <a href="{{ url_for('guides_list') }}" class="btn-outline"><i class="ti ti-book" aria-hidden="true"></i> Browse
+        Guides</a>
+    </div>
+  </div>
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ti ti-first-aid-kit" aria-hidden="true"></i></div>
+      <div class="feature-title">First-aid guides</div>
+      <div class="feature-desc">Step-by-step instructions for common pet emergencies</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ti ti-video" aria-hidden="true"></i></div>
+      <div class="feature-title">Educational videos</div>
+      <div class="feature-desc">Watch vet-approved videos to learn proper pet care</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
+      <div class="feature-title">Quizzes</div>
+      <div class="feature-desc">Test your knowledge and earn confidence in emergencies</div>
+    </div>
+  </div>
+
+  {% elif active_view == 'register' %}
+  <!-- Screen 2 — Register Page -->
+  <div class="form-screen">
+    <div class="form-title">Create your account</div>
+    <div class="form-sub">Join PetAid to access personalised first-aid content for your pets</div>
+
+    <form action="{{ url_for('register_route') }}" method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First name</label>
+          <input class="form-input {% if errors and errors.first_name %}input-error{% endif %}" type="text"
+            name="first_name" placeholder="John" value="{{ values.first_name or '' }}" required />
+          {% if errors and errors.first_name %}
+          <div class="error-msg"><i class="ti ti-alert-circle" aria-hidden="true"></i> {{ errors.first_name }}</div>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last name</label>
+          <input class="form-input {% if errors and errors.last_name %}input-error{% endif %}" type="text"
+            name="last_name" placeholder="Doe" value="{{ values.last_name or '' }}" required />
+          {% if errors and errors.last_name %}
+          <div class="error-msg"><i class="ti ti-alert-circle" aria-hidden="true"></i> {{ errors.last_name }}</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input class="form-input {% if errors and errors.username %}input-error{% endif %}" type="text" name="username"
+          placeholder="johndoe" value="{{ values.username or '' }}" required />
+        {% if errors and errors.username %}
+        <div class="error-msg"><i class="ti ti-alert-circle" aria-hidden="true"></i> {{ errors.username }}</div>
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-input {% if errors and errors.email %}input-error{% endif %}" type="email" name="email"
+          placeholder="john@email.com" value="{{ values.email or '' }}" required />
+        {% if errors and errors.email %}
+        <div class="error-msg"><i class="ti ti-alert-circle" aria-hidden="true"></i> {{ errors.email }}</div>
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input {% if errors and errors.password %}input-error{% endif %}" type="password"
+          name="password" placeholder="Min. 8 characters" required />
+        {% if errors and errors.password %}
+        <div class="error-msg"><i class="ti ti-alert-circle" aria-hidden="true"></i> {{ errors.password }}</div>
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm password</label>
+        <input class="form-input {% if errors and errors.confirm_password %}input-error{% endif %}" type="password"
+          name="confirm_password" placeholder="Re-enter password" required />
+        {% if errors and errors.confirm_password %}
+        <div class="error-msg"><i class="ti ti-alert-circle" aria-hidden="true"></i> {{ errors.confirm_password }}</div>
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone number (optional)</label>
+        <input class="form-input" type="tel" name="phone_number" placeholder="+60 12 345 6789"
+          value="{{ values.phone_number or '' }}" />
+      </div>
+      <button class="form-submit" type="submit">Create account</button>
+    </form>
+    <div class="form-footer">Already have an account? <a href="{{ url_for('login_route') }}">Log in</a></div>
+  </div>
+
+  {% elif active_view == 'login' %}
+  <!-- Screen 3 — Log In Page -->
+  <div class="form-screen">
+    <div class="form-title">Welcome back</div>
+    <div class="form-sub">Log in to access your pet profiles and saved content</div>
+
+    <form action="{{ url_for('login_route') }}" method="POST">
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-input {% if errors and errors.email %}input-error{% endif %}" type="email" id="login_email"
+          name="email" placeholder="john@email.com" value="{{ values.email or '' }}" required />
+        {% if errors and errors.email %}
+        <div class="error-msg"><i class="ti ti-alert-circle" aria-hidden="true"></i> {{ errors.email }}</div>
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input {% if errors and errors.password %}input-error{% endif %}" type="password"
+          id="login_password" name="password" placeholder="Enter your password" required />
+        {% if errors and errors.password %}
+        <div class="error-msg"><i class="ti ti-alert-circle" aria-hidden="true"></i> {{ errors.password }}</div>
+        {% endif %}
+      </div>
+      <button class="form-submit" type="submit">Log in</button>
+    </form>
+
+    <hr class="divider" />
+    <div style="text-align:center;font-size:13px;color:var(--color-text-secondary);">
+      <div style="margin-bottom:12px;">Log in as demo roles:</div>
+      <div style="display:flex;gap:8px;justify-content:center;">
+        <button
+          style="border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);border-radius:var(--border-radius-md);padding:8px 16px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;"
+          onclick="quickLogin('admin@petaid.com', 'admin123')">
+          <i class="ti ti-shield" aria-hidden="true"></i> Administrator
+        </button>
+        <button
+          style="border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);border-radius:var(--border-radius-md);padding:8px 16px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;"
+          onclick="quickLogin('vet@petaid.com', 'vet123')">
+          <i class="ti ti-stethoscope" aria-hidden="true"></i> Vet Expert
+        </button>
+      </div>
+      <div style="margin-top:10px;">
+        <button
+          style="border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);border-radius:var(--border-radius-md);padding:8px 16px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;margin: 0 auto;"
+          onclick="quickLogin('rad@email.com', 'user123')">
+          <i class="ti ti-user" aria-hidden="true"></i> Pet Owner (Radzien)
+        </button>
+      </div>
+    </div>
+    <div class="form-footer" style="margin-top:20px;">Don't have an account? <a
+        href="{{ url_for('register_route') }}">Register</a></div>
+  </div>
+
+  <script>
+    function quickLogin(email, password) {
+      document.getElementById('login_email').value = email;
+      document.getElementById('login_password').value = password;
+    }
+  </script>
+  {% endif %}
+</div>
+{% endblock %}

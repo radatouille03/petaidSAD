@@ -1,0 +1,267 @@
+
+<style>
+  .screen-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; font-weight: 500; }
+  .screen { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 2rem; }
+  .nav { background: #0F6E56; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { color: #fff; font-size: 18px; font-weight: 500; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-user { color: #fff; font-size: 13px; }
+  .nav-logout { background: rgba(255,255,255,0.15); color: #fff; border: none; border-radius: var(--border-radius-md); padding: 5px 12px; font-size: 13px; cursor: pointer; }
+  .layout { display: grid; grid-template-columns: 200px 1fr; min-height: 500px; }
+  .sidebar { background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); padding: 20px 0; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; }
+  .sidebar-item.active { background: #E1F5EE; color: #0F6E56; font-weight: 500; border-right: 2px solid #0F6E56; }
+  .sidebar-item i { font-size: 16px; }
+  .main { padding: 24px; }
+  .page-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 24px; }
+  .quiz-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .quiz-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; }
+  .quiz-icon { width: 40px; height: 40px; border-radius: var(--border-radius-md); background: #E1F5EE; display: flex; align-items: center; justify-content: center; color: #0F6E56; font-size: 18px; flex-shrink: 0; }
+  .quiz-info { flex: 1; }
+  .quiz-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
+  .quiz-meta { font-size: 12px; color: var(--color-text-secondary); }
+  .quiz-action { font-size: 13px; color: #0F6E56; font-weight: 500; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; }
+  .badge-green { background: #E1F5EE; color: #0F6E56; }
+  .badge-amber { background: #FAEEDA; color: #854F0B; }
+  .badge-gray { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+  .quiz-header { background: #E1F5EE; padding: 16px 24px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: space-between; }
+  .quiz-progress-text { font-size: 13px; color: #0F6E56; }
+  .progress-bar-outer { height: 6px; background: #9FE1CB; border-radius: 3px; flex: 1; margin: 0 16px; }
+  .progress-bar-fill { height: 100%; background: #0F6E56; border-radius: 3px; }
+  .question-body { padding: 28px 32px; max-width: 600px; }
+  .question-num { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 8px; }
+  .question-text { font-size: 16px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 24px; line-height: 1.5; }
+  .options-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .option { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: pointer; font-size: 13px; color: var(--color-text-primary); }
+  .option.selected { border-color: #0F6E56; background: #E1F5EE; color: #085041; }
+  .option.correct { border-color: #0F6E56; background: #E1F5EE; color: #085041; }
+  .option.wrong { border-color: #A32D2D; background: #FCEBEB; color: #A32D2D; }
+  .option-letter { width: 24px; height: 24px; border-radius: 50%; background: var(--color-background-secondary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+  .option.selected .option-letter { background: #0F6E56; color: #fff; }
+  .option.correct .option-letter { background: #0F6E56; color: #fff; }
+  .option.wrong .option-letter { background: #A32D2D; color: #fff; }
+  .btn-primary { background: #0F6E56; color: #fff; border: none; border-radius: var(--border-radius-md); padding: 10px 24px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .btn-outline { background: transparent; color: #0F6E56; border: 1px solid #0F6E56; border-radius: var(--border-radius-md); padding: 10px 24px; font-size: 13px; cursor: pointer; }
+  .result-hero { padding: 32px; text-align: center; background: #E1F5EE; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .score-circle { width: 100px; height: 100px; border-radius: 50%; background: #0F6E56; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .score-num { font-size: 28px; font-weight: 500; color: #fff; line-height: 1; }
+  .score-total { font-size: 13px; color: rgba(255,255,255,0.8); }
+  .result-title { font-size: 18px; font-weight: 500; color: #085041; margin-bottom: 6px; }
+  .result-sub { font-size: 13px; color: #0F6E56; }
+  .result-body { padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .result-stats { display: flex; flex-direction: column; gap: 10px; }
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); font-size: 13px; }
+  .stat-label { color: var(--color-text-secondary); }
+  .stat-val { font-weight: 500; color: var(--color-text-primary); }
+  .answers-review { display: flex; flex-direction: column; gap: 8px; }
+  .answer-item { padding: 10px 14px; border-radius: var(--border-radius-md); font-size: 12px; }
+  .answer-correct { background: #E1F5EE; color: #085041; }
+  .answer-wrong { background: #FCEBEB; color: #A32D2D; }
+  .answer-q { font-weight: 500; margin-bottom: 3px; }
+  .answer-a { opacity: 0.85; }
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); }
+  .history-info { flex: 1; }
+  .history-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .history-meta { font-size: 12px; color: var(--color-text-secondary); }
+  .history-score { font-size: 13px; font-weight: 500; color: #0F6E56; }
+</style>
+
+<h2 class="sr-only">PetAid take quiz and view quiz result screens</h2>
+
+<p class="screen-label">Screen 10 — Quiz List</p>
+<div class="screen">
+  <div class="nav">
+    <span class="nav-logo"><i class="ti ti-paw" aria-hidden="true"></i> PetAid</span>
+    <div class="nav-right">
+      <span class="nav-user"><i class="ti ti-user" aria-hidden="true"></i> John Doe</span>
+      <button class="nav-logout"><i class="ti ti-logout" aria-hidden="true"></i> Log out</button>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-item"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="sidebar-item"><i class="ti ti-user"></i> My Profile</div>
+      <div class="sidebar-item"><i class="ti ti-paw"></i> My Pets</div>
+      <div class="sidebar-item"><i class="ti ti-search"></i> Search Emergency</div>
+      <div class="sidebar-item"><i class="ti ti-book"></i> First-aid Guides</div>
+      <div class="sidebar-item"><i class="ti ti-video"></i> Videos</div>
+      <div class="sidebar-item active"><i class="ti ti-clipboard-check"></i> Quizzes</div>
+    </div>
+    <div class="main">
+      <div class="page-title">Quizzes</div>
+      <div class="page-sub">Test your knowledge on pet first-aid</div>
+      <div class="quiz-list">
+        <div class="quiz-card">
+          <div class="quiz-icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
+          <div class="quiz-info">
+            <div class="quiz-title">Dog Emergency Basics</div>
+            <div class="quiz-meta">10 questions • Dog • Last score: 8/10</div>
+          </div>
+          <span class="badge badge-green" style="margin-right:12px;">Completed</span>
+          <span class="quiz-action">Retake <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="quiz-card">
+          <div class="quiz-icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
+          <div class="quiz-info">
+            <div class="quiz-title">Cat Emergency Basics</div>
+            <div class="quiz-meta">10 questions • Cat • Last score: 6/10</div>
+          </div>
+          <span class="badge badge-amber" style="margin-right:12px;">Completed</span>
+          <span class="quiz-action">Retake <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="quiz-card">
+          <div class="quiz-icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
+          <div class="quiz-info">
+            <div class="quiz-title">Rabbit and Hamster Care</div>
+            <div class="quiz-meta">8 questions • Rabbit, Hamster</div>
+          </div>
+          <span class="badge badge-gray" style="margin-right:12px;">Not started</span>
+          <span class="quiz-action">Start <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="quiz-card">
+          <div class="quiz-icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
+          <div class="quiz-info">
+            <div class="quiz-title">General Pet First-Aid</div>
+            <div class="quiz-meta">12 questions • All pets</div>
+          </div>
+          <span class="badge badge-gray" style="margin-right:12px;">Not started</span>
+          <span class="quiz-action">Start <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="screen-label">Screen 10b — Take Quiz (in progress)</p>
+<div class="screen">
+  <div class="nav">
+    <span class="nav-logo"><i class="ti ti-paw" aria-hidden="true"></i> PetAid</span>
+    <div class="nav-right">
+      <span class="nav-user"><i class="ti ti-user" aria-hidden="true"></i> John Doe</span>
+    </div>
+  </div>
+  <div class="quiz-header">
+    <span class="quiz-progress-text">Question 3 of 10</span>
+    <div class="progress-bar-outer">
+      <div class="progress-bar-fill" style="width:30%"></div>
+    </div>
+    <span class="quiz-progress-text">Dog Emergency Basics</span>
+  </div>
+  <div class="question-body">
+    <div class="question-num">Question 3</div>
+    <div class="question-text">What is the first thing you should do if your dog is choking and you can see the object in its mouth?</div>
+    <div class="options-list">
+      <div class="option">
+        <div class="option-letter">A</div>
+        Do a blind finger sweep to remove the object
+      </div>
+      <div class="option selected">
+        <div class="option-letter">B</div>
+        Carefully try to remove it with two fingers if safely reachable
+      </div>
+      <div class="option">
+        <div class="option-letter">C</div>
+        Immediately apply abdominal thrusts
+      </div>
+      <div class="option">
+        <div class="option-letter">D</div>
+        Give the dog water to try to dislodge the object
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-outline"><i class="ti ti-arrow-left" aria-hidden="true"></i> Previous</button>
+      <button class="btn-primary">Next question <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+    </div>
+  </div>
+</div>
+
+<p class="screen-label">Screen 11 — View Quiz Result</p>
+<div class="screen">
+  <div class="nav">
+    <span class="nav-logo"><i class="ti ti-paw" aria-hidden="true"></i> PetAid</span>
+    <div class="nav-right">
+      <span class="nav-user"><i class="ti ti-user" aria-hidden="true"></i> John Doe</span>
+      <button class="nav-logout"><i class="ti ti-logout" aria-hidden="true"></i> Log out</button>
+    </div>
+  </div>
+  <div class="result-hero">
+    <div class="score-circle">
+      <div class="score-num">8</div>
+      <div class="score-total">out of 10</div>
+    </div>
+    <div class="result-title">Great job, John!</div>
+    <div class="result-sub">You scored 80% on Dog Emergency Basics</div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;">
+      <button class="btn-primary">Retake quiz</button>
+      <button class="btn-outline">Back to quizzes</button>
+    </div>
+  </div>
+  <div class="result-body">
+    <div>
+      <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:12px;">Summary</div>
+      <div class="result-stats">
+        <div class="stat-row">
+          <span class="stat-label">Correct answers</span>
+          <span class="stat-val" style="color:#0F6E56;">8 / 10</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Wrong answers</span>
+          <span class="stat-val" style="color:#A32D2D;">2 / 10</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Score</span>
+          <span class="stat-val">80%</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Time taken</span>
+          <span class="stat-val">4 min 22 sec</span>
+        </div>
+      </div>
+      <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin:16px 0 12px;">Past attempts</div>
+      <div class="history-list">
+        <div class="history-item">
+          <div class="history-info">
+            <div class="history-title">Dog Emergency Basics</div>
+            <div class="history-meta">Today, 2:15 PM</div>
+          </div>
+          <span class="history-score">8/10</span>
+        </div>
+        <div class="history-item">
+          <div class="history-info">
+            <div class="history-title">Dog Emergency Basics</div>
+            <div class="history-meta">3 days ago</div>
+          </div>
+          <span class="history-score">6/10</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:12px;">Answer review</div>
+      <div class="answers-review">
+        <div class="answer-item answer-correct">
+          <div class="answer-q"><i class="ti ti-check" aria-hidden="true"></i> Q1 — What is the first sign of choking in a dog?</div>
+          <div class="answer-a">Your answer: Pawing at the mouth ✓</div>
+        </div>
+        <div class="answer-item answer-correct">
+          <div class="answer-q"><i class="ti ti-check" aria-hidden="true"></i> Q2 — How many back blows should you apply?</div>
+          <div class="answer-a">Your answer: Up to 5 ✓</div>
+        </div>
+        <div class="answer-item answer-wrong">
+          <div class="answer-q"><i class="ti ti-x" aria-hidden="true"></i> Q3 — Should you do a blind finger sweep?</div>
+          <div class="answer-a">Your answer: Yes — Correct: No, never do a blind sweep</div>
+        </div>
+        <div class="answer-item answer-correct">
+          <div class="answer-q"><i class="ti ti-check" aria-hidden="true"></i> Q4 — What should you do after removing the object?</div>
+          <div class="answer-a">Your answer: Take the dog to a vet ✓</div>
+        </div>
+        <div class="answer-item answer-wrong">
+          <div class="answer-q"><i class="ti ti-x" aria-hidden="true"></i> Q5 — Where do you place your fist for abdominal thrusts?</div>
+          <div class="answer-a">Your answer: Below the chest — Correct: Below the rib cage</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

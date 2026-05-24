@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+
+{% block title %}PetAid Admin — Management{% endblock %}
+
+{% block content %}
+<style>
+  .layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 54px); }
+  .sidebar { background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); padding: 20px 0; }
+  .sidebar-section { font-size: 11px; color: var(--color-text-secondary); padding: 8px 20px 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; text-decoration: none; transition: all 0.2s; }
+  .sidebar-item:hover { background: #EEEDFE; color: #3C3489; }
+  .sidebar-item.active { background: #EEEDFE; color: #3C3489; font-weight: 600; border-right: 3px solid #3C3489; }
+  .sidebar-item i { font-size: 16px; }
+  
+  .main { padding: 32px; background: #FFFFFF; }
+  .page-title { font-size: 22px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 6px; }
+  .page-sub { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 32px; }
+  
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+  .stat-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; font-weight: 500; }
+  .stat-value { font-size: 28px; font-weight: 600; color: var(--color-text-primary); }
+  .stat-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; font-weight: 500; }
+  
+  .section-title { font-size: 16px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 16px; }
+  
+  /* Tables */
+  .table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+  .table th { text-align: left; padding: 12px; color: var(--color-text-secondary); font-weight: 600; border-bottom: 1px solid var(--color-border-secondary); }
+  .table td { padding: 14px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); }
+  
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+  .badge-green { background: #E1F5EE; color: #0F6E56; }
+  .badge-amber { background: #FAEEDA; color: #854F0B; }
+  .badge-red { background: #FCEBEB; color: #A32D2D; }
+  .badge-purple { background: #EEEDFE; color: #3C3489; }
+  .badge-gray { background: var(--color-border-tertiary); color: var(--color-text-secondary); }
+  
+  .action-btns { display: flex; gap: 8px; }
+  .icon-btn { background: none; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 6px 10px; cursor: pointer; color: var(--color-text-secondary); font-size: 14px; text-decoration: none; display: inline-flex; align-items: center; transition: all 0.2s; }
+  .icon-btn:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+  .icon-btn-danger { color: var(--color-text-danger); border-color: var(--color-border-danger); }
+  .icon-btn-danger:hover { background: #FDE8E8; }
+
+  .btn-primary { background: #3C3489; color: #fff; border: none; border-radius: var(--border-radius-md); padding: 10px 24px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn-primary:hover { background: #2f2870; }
+  
+  .btn-outline { background: transparent; color: #3C3489; border: 1.5px solid #3C3489; border-radius: var(--border-radius-md); padding: 10px 24px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn-outline:hover { background: #EEEDFE; }
+  
+  .btn-danger { background: #DC2626; color: #fff; border: none; border-radius: var(--border-radius-md); padding: 10px 24px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn-danger:hover { background: #B91C1C; }
+
+  /* Form components */
+  .form-group { margin-bottom: 20px; text-align: left; }
+  .form-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 6px; display: block; font-weight: 500; }
+  .form-input { width: 100%; padding: 10px 14px; border: 1px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 14px; background: var(--color-background-primary); color: var(--color-text-primary); box-sizing: border-box; outline: none; }
+  .form-input:focus { border-color: #3C3489; }
+  .form-textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 14px; background: var(--color-background-primary); color: var(--color-text-primary); box-sizing: border-box; min-height: 120px; resize: vertical; outline: none; }
+  .form-textarea:focus { border-color: #3C3489; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* Pending Review styling */
+  .pending-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); margin-bottom: 12px; }
+  .pending-icon { width: 44px; height: 44px; border-radius: var(--border-radius-md); background: #EEEDFE; display: flex; align-items: center; justify-content: center; color: #3C3489; font-size: 20px; flex-shrink: 0; }
+  .pending-info { flex: 1; }
+  .pending-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); }
+  .pending-meta { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+  
+  /* Tabs */
+  .tab-bar { display: flex; border-bottom: 1px solid var(--color-border-secondary); margin-bottom: 24px; }
+  .tab { padding: 12px 24px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px; text-decoration: none; font-weight: 500; }
+  .tab.active { color: #3C3489; border-bottom-color: #3C3489; font-weight: 600; }
+
+  /* Modals overlay styling */
+  .modal-overlay { background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; position: fixed; inset:0; z-index:9999; padding: 20px; }
+  .modal { background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 28px; max-width: 420px; width: 100%; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+  .modal-title { font-size: 18px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px; }
+  .modal-body { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 24px; line-height: 1.6; }
+</style>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">Overview</div>
+    <a href="{{ url_for('admin_dashboard') }}" class="sidebar-item {% if active_tab == 'dashboard' %}active{% endif %}"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+    <div class="sidebar-section">Content Management</div>
+    <a href="{{ url_for('admin_manage', ctype='guide') }}" class="sidebar-item {% if active_tab == 'guides' %}active{% endif %}"><i class="ti ti-book"></i> Manage Guides</a>
+    <a href="{{ url_for('admin_manage', ctype='video') }}" class="sidebar-item {% if active_tab == 'videos' %}active{% endif %}"><i class="ti ti-video"></i> Manage Videos</a>
+    <a href="{{ url_for('admin_manage', ctype='quiz') }}" class="sidebar-item {% if active_tab == 'quizzes' %}active{% endif %}"><i class="ti ti-clipboard-check"></i> Manage Quizzes</a>
+    <div class="sidebar-section">Users</div>
+    <a href="{{ url_for('admin_users') }}" class="sidebar-item {% if active_tab == 'users' %}active{% endif %}"><i class="ti ti-users"></i> Manage Users</a>
+  </div>
+
+  <div class="main">
+    {% if active_tab == 'dashboard' %}
+      <!-- Screen 12 — Admin Dashboard -->
+      <div class="page-title">Admin Dashboard</div>
+      <div class="page-sub">Overview of system content and activity</div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total guides</div>
+          <div class="stat-value">{{ guides_count }}</div>
+          <div class="stat-sub">{{ pending_guides_count }} pending review</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total videos</div>
+          <div class="stat-value">{{ videos_count }}</div>
+          <div class="stat-sub">{{ pending_videos_count }} pending review</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total quizzes</div>
+          <div class="stat-value">{{ quizzes_count }}</div>
+          <div class="stat-sub">{{ pending_quizzes_count }} pending review</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Registered users</div>
+          <div class="stat-value">{{ users_count }}</div>
+          <div class="stat-sub">Active members</div>
+        </div>
+      </div>
+      
+      <div class="section-title">Pending content review</div>
+      {% for item in pending_items %}
+        <div class="pending-item">
+          <div class="pending-icon">
+            {% if item.content_type == 'guide' %}
+              <i class="ti ti-book" aria-hidden="true"></i>
+            {% elif item.content_type == 'video' %}
+              <i class="ti ti-video" aria-hidden="true"></i>
+            {% else %}
+              <i class="ti ti-clipboard-check" aria-hidden="true"></i>
+            {% endif %}
+          </div>
+          <div class="pending-info">
+            <div class="pending-title">{{ item.title }}</div>
+            <div class="pending-meta">
+              {{ item.content_type | capitalize }} • Submitted by Admin {{ item.author.first_name }} • {{ item.publish_date.strftime('%Y-%m-%d') }}
+            </div>
+          </div>
+          <span class="badge badge-amber">Pending</span>
+        </div>
+      {% else %}
+        <div style="text-align:center; padding:32px; color:var(--color-text-secondary); background:var(--color-background-secondary); border-radius: var(--border-radius-lg);">
+          No content pending verification.
+        </div>
+      {% endfor %}
+
+    {% elif active_tab in ['guides', 'videos', 'quizzes'] %}
+      <!-- Screen 13 — Manage Content -->
+      {% set ctype = 'guide' if active_tab == 'guides' else ('video' if active_tab == 'videos' else 'quiz') %}
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div class="page-title">Manage {{ active_tab | capitalize }}</div>
+        <a href="{{ url_for('admin_add', ctype=ctype) }}" class="btn-primary"><i class="ti ti-plus" aria-hidden="true"></i> Add new {{ ctype }}</a>
+      </div>
+      <div class="page-sub">Create, edit and delete first-aid {{ active_tab }}</div>
+      
+      <!-- Sub-filter Tabs based on verification status -->
+      {% set active_status = request.args.get('status', 'all') %}
+      <div class="tab-bar">
+        <a href="{{ url_for('admin_manage', ctype=ctype, status='all') }}" class="tab {% if active_status == 'all' %}active{% endif %}">All</a>
+        <a href="{{ url_for('admin_manage', ctype=ctype, status='Approved') }}" class="tab {% if active_status == 'Approved' %}active{% endif %}">Published / Approved</a>
+        <a href="{{ url_for('admin_manage', ctype=ctype, status='Pending') }}" class="tab {% if active_status == 'Pending' %}active{% endif %}">Pending Review</a>
+        <a href="{{ url_for('admin_manage', ctype=ctype, status='Rejected') }}" class="tab {% if active_status == 'Rejected' %}active{% endif %}">Rejected</a>
+        <a href="{{ url_for('admin_manage', ctype=ctype, status='Draft') }}" class="tab {% if active_status == 'Draft' %}active{% endif %}">Drafts</a>
+      </div>
+      
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Species</th>
+            {% if ctype != 'quiz' %}<th>Severity</th>{% endif %}
+            <th>Status</th>
+            <th>Submitted</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+            <tr>
+              <td>
+                <strong>{{ item.title }}</strong>
+                {% if item.rejection_feedback and item.verification_status == 'Rejected' %}
+                  <div style="font-size:11px; color:var(--color-text-danger); font-weight:500; margin-top:4px;">
+                    <i class="ti ti-alert-triangle"></i> Vet Reason: "{{ item.rejection_feedback }}"
+                  </div>
+                {% endif %}
+              </td>
+              <td>{{ item.species }}</td>
+              {% if ctype != 'quiz' %}
+                <td>
+                  <span class="badge {% if item.severity == 'Critical' %}badge-red{% elif item.severity == 'Moderate' %}badge-amber{% else %}badge-green{% endif %}">
+                    {{ item.severity }}
+                  </span>
+                </td>
+              {% endif %}
+              <td>
+                <span class="badge {% if item.verification_status == 'Approved' %}badge-green{% elif item.verification_status == 'Pending' %}badge-amber{% elif item.verification_status == 'Rejected' %}badge-red{% else %}badge-gray{% endif %}">
+                  {{ item.verification_status }}
+                </span>
+              </td>
+              <td>{{ item.publish_date.strftime('%Y-%m-%d') }}</td>
+              <td>
+                <div class="action-btns">
+                  <a href="{{ url_for('admin_edit', ctype=ctype, content_id=item.id) }}" class="icon-btn"><i class="ti ti-edit" aria-hidden="true"></i></a>
+                  <a href="{{ url_for('admin_delete_confirm', ctype=ctype, content_id=item.id) }}" class="icon-btn icon-btn-danger"><i class="ti ti-trash" aria-hidden="true"></i></a>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" style="text-align:center; padding: 24px; color: var(--color-text-secondary);">No {{ active_tab }} found in this status category.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    {% elif active_tab == 'add_edit' %}
+      <!-- Screen 14 — Add / Edit Content Form -->
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:8px; cursor:pointer;" onclick="location.href='{{ url_for('admin_manage', ctype=ctype) }}'"><i class="ti ti-arrow-left" aria-hidden="true"></i> Back to manage list</div>
+      <div class="page-title">{% if item %}Edit {{ ctype | capitalize }}{% else %}Add new {{ ctype | capitalize }}{% endif %}</div>
+      <div class="page-sub">Fill in the details below to create or update educational content</div>
+      
+      <div style="max-width:600px; background:#fff; border:0.5px solid var(--color-border-tertiary); padding:28px; border-radius:var(--border-radius-lg);">
+        <form action="{% if item %}{{ url_for('admin_edit_post', ctype=ctype, content_id=item.id) }}{% else %}{{ url_for('admin_add_post', ctype=ctype) }}{% endif %}" method="POST">
+          <div class="form-group">
+            <label class="form-label">{{ ctype | capitalize }} title</label>
+            <input class="form-input" type="text" name="title" placeholder="e.g. What to do if your cat is choking" value="{% if item %}{{ item.title }}{% endif %}" required />
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Summary / Description</label>
+            <input class="form-input" type="text" name="description" placeholder="Brief description of this content" value="{% if item %}{{ item.description }}{% endif %}" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Applies to Species</label>
+              <select class="form-input" name="species" required>
+                <option value="" disabled {% if not item %}selected{% endif %}>Select species</option>
+                <option value="Dog" {% if item and item.species == 'Dog' %}selected{% endif %}>Dog</option>
+                <option value="Cat" {% if item and item.species == 'Cat' %}selected{% endif %}>Cat</option>
+                <option value="Rabbit" {% if item and item.species == 'Rabbit' %}selected{% endif %}>Rabbit</option>
+                <option value="Hamster" {% if item and item.species == 'Hamster' %}selected{% endif %}>Hamster</option>
+                <option value="All pets" {% if item and item.species == 'All pets' %}selected{% endif %}>All pets</option>
+              </select>
+            </div>
+            
+            {% if ctype != 'quiz' %}
+              <div class="form-group">
+                <label class="form-label">Severity level</label>
+                <select class="form-input" name="severity" required>
+                  <option value="" disabled {% if not item %}selected{% endif %}>Select severity</option>
+                  <option value="Critical" {% if item and item.severity == 'Critical' %}selected{% endif %}>Critical</option>
+                  <option value="Moderate" {% if item and item.severity == 'Moderate' %}selected{% endif %}>Moderate</option>
+                  <option value="Minor" {% if item and item.severity == 'Minor' %}selected{% endif %}>Minor</option>
+                </select>
+              </div>
+            {% endif %}
+          </div>
+          
+          {% if ctype == 'guide' %}
+            <div class="form-group">
+              <label class="form-label">Guide steps (Enter each step on a new line, e.g. Step 1: title | description)</label>
+              <textarea class="form-textarea" name="steps_raw" placeholder="1: Stay calm | Restrain the pet safely.&#10;2: Check the throat | Open the mouth and check airway.&#10;3: Call Vet | Seek clinical support." required>{% if item %}{% for step in item.steps %}{{ step.step_number }}: {{ step.title }} | {{ step.description }}&#10;{% endfor %}{% endif %}</textarea>
+            </div>
+          {% elif ctype == 'video' %}
+            <div class="form-group">
+              <label class="form-label">Video URL</label>
+              <input class="form-input" type="url" name="video_url" placeholder="https://www.youtube.com/embed/..." value="{% if item %}{{ item.video_url }}{% endif %}" required />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Duration (e.g. 4:32)</label>
+                <input class="form-input" type="text" name="duration" placeholder="e.g. 4:32" value="{% if item %}{{ item.duration }}{% endif %}" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Transcript (optional)</label>
+              <textarea class="form-textarea" name="transcript" placeholder="Video speech transcript...">{% if item %}{{ item.transcript or '' }}{% endif %}</textarea>
+            </div>
+          {% elif ctype == 'quiz' %}
+            <div class="form-group">
+              <label class="form-label">Quiz Question (Single Question Seed, raw formatting: Question | Opt A | Opt B | Opt C | Opt D | Correct option code [A/B/C/D])</label>
+              <textarea class="form-textarea" name="questions_raw" placeholder="What should you do? | A) Option A | B) Option B | C) Option C | D) Option D | B" required>{% if item %}{% for q in item.questions %}{{ q.question_text }} | {{ q.option_a }} | {{ q.option_b }} | {{ q.option_c }} | {{ q.option_d }} | {{ q.correct_option }}&#10;{% endfor %}{% endif %}</textarea>
+            </div>
+          {% endif %}
+          
+          <div class="form-group">
+            <label class="form-label">Publishing status</label>
+            <select class="form-input" name="verification_status" required>
+              <option value="Draft" {% if item and item.verification_status == 'Draft' %}selected{% endif %}>Draft (Save locally)</option>
+              <option value="Pending" {% if not item or item.verification_status == 'Pending' %}selected{% endif %}>Submit for review (Verify with Vets)</option>
+            </select>
+          </div>
+          
+          <div style="display:flex;gap:12px;margin-top:8px;">
+            <button class="btn-primary" type="submit">Save {{ ctype }}</button>
+            <a href="{{ url_for('admin_manage', ctype=ctype) }}" class="btn-outline">Cancel</a>
+          </div>
+        </form>
+      </div>
+
+    {% elif active_tab == 'delete_confirm' %}
+      <!-- Screen 15 — Delete Confirmation -->
+      <div class="modal-overlay">
+        <div class="modal">
+          <div style="width:48px;height:48px;border-radius:50%;background:#FCEBEB;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+            <i class="ti ti-trash" style="font-size:24px;color:#A32D2D;" aria-hidden="true"></i>
+          </div>
+          <div class="modal-title">Delete this {{ ctype }}?</div>
+          <div class="modal-body">
+            You are about to delete <strong>"{{ item.title }}"</strong>. This action cannot be undone and this content will be permanently removed from the system database.
+          </div>
+          <form action="{{ url_for('admin_delete_post', ctype=ctype, content_id=item.id) }}" method="POST">
+            <div style="display:flex;gap:12px;">
+              <button class="btn-danger" type="submit" style="flex:1;">Yes, delete</button>
+              <a href="{{ url_for('admin_manage', ctype=ctype) }}" class="btn-outline" style="flex:1; text-align:center;">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    {% elif active_tab == 'users' %}
+      <!-- Manage Users Screen -->
+      <div class="page-title">Manage Users</div>
+      <div class="page-sub">View and remove registered user and vet expert accounts</div>
+      
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for acc in accounts %}
+            <tr>
+              <td><strong>{{ acc.username }}</strong></td>
+              <td>{{ acc.first_name }} {{ acc.last_name }}</td>
+              <td>{{ acc.email }}</td>
+              <td>{{ acc.phone_number or 'None' }}</td>
+              <td>
+                <span class="badge {% if acc.role == 'user' %}badge-green{% elif acc.role == 'vet' %}badge-purple{% else %}badge-gray{% endif %}">
+                  {{ acc.role | capitalize }}
+                </span>
+              </td>
+              <td>
+                {% if acc.id != session.get('user_id') %}
+                  <form action="{{ url_for('admin_delete_user', user_id=acc.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this account? All their associated records will be deleted.');" style="display:inline;">
+                    <button type="submit" class="icon-btn icon-btn-danger"><i class="ti ti-trash" aria-hidden="true"></i> Remove</button>
+                  </form>
+                {% else %}
+                  <span style="font-size:11px;color:var(--color-text-secondary);font-style:italic;">Current Admin</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" style="text-align:center; padding: 24px; color: var(--color-text-secondary);">No user accounts found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
