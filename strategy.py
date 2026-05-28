@@ -5,7 +5,7 @@ from sqlalchemy import or_, case
 
 class SearchStrategy(ABC):
     @abstractmethod
-    def search(self, query: str, species_filter: str):
+    def search(self, query: str, species_filter: str) -> list:
         """
         Execute search query and return a list of EmergencyCase records.
         """
@@ -13,7 +13,7 @@ class SearchStrategy(ABC):
 
 
 class KeywordSearchStrategy(SearchStrategy):
-    def search(self, query: str, species_filter: str):
+    def search(self, query: str, species_filter: str) -> list:
         """
         Keyword search: matches title, description, or keywords.
         """
@@ -40,7 +40,7 @@ class KeywordSearchStrategy(SearchStrategy):
 
 
 class SeveritySpeciesSearchStrategy(SearchStrategy):
-    def search(self, query: str, species_filter: str):
+    def search(self, query: str, species_filter: str) -> list:
         """
         Filters by species and sorts results by severity level:
         Critical -> Moderate -> Minor
@@ -75,11 +75,11 @@ class SeveritySpeciesSearchStrategy(SearchStrategy):
 
 
 class SearchContext:
-    def __init__(self, strategy: SearchStrategy = None):
+    def __init__(self, strategy: SearchStrategy | None = None):
         self._strategy = strategy or KeywordSearchStrategy()
 
     def set_strategy(self, strategy: SearchStrategy):
         self._strategy = strategy
 
-    def execute_search(self, query: str, species_filter: str):
+    def execute_search(self, query: str, species_filter: str) -> list:
         return self._strategy.search(query, species_filter)

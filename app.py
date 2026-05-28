@@ -487,6 +487,8 @@ def submit_question():
         db.session.commit()
         
         result_id = result.id
+        # Save answers to show on result page
+        session['last_quiz_answers'] = session['quiz_answers']
         # Clear quiz state
         session.pop('quiz_id', None)
         session.pop('quiz_answers', None)
@@ -509,8 +511,9 @@ def view_quiz_result(result_id):
         QuizResult.id != result.id
     ).order_by(QuizResult.timestamp.desc()).all()
     
-    # We mock the user answers review block (matching correctly vs wrong reviews as mockup items)
-    # The actual details will be displayed for the questions
+    # Load user answers from session
+    user_answers = session.get('last_quiz_answers', {})
+    
     return render_template(
         'quiz_result.html',
         active_tab='quiz_result',
@@ -518,7 +521,7 @@ def view_quiz_result(result_id):
         quiz=quiz,
         history=history,
         questions_review=quiz.questions,
-        user_answers={}  # Empty to mock default options or can pass real logs
+        user_answers=user_answers
     )
 
 

@@ -191,15 +191,47 @@
 
     {% elif active_tab == 'quiz_result' %}
       <!-- Screen 11 — View Quiz Result -->
-      <div class="result-hero">
-        <div class="score-circle">
+      {% set pct = ((result.score / result.total_questions) * 100)|int %}
+
+      {% if pct >= 80 %}
+        {% set score_bg = '#0F6E56' %}
+        {% set hero_bg = '#E1F5EE' %}
+        {% set hero_border = '#BCF0DA' %}
+        {% set title_color = '#085041' %}
+        {% set sub_color = '#0F6E56' %}
+      {% elif pct >= 50 %}
+        {% set score_bg = '#B8860B' %}
+        {% set hero_bg = '#FFF8E1' %}
+        {% set hero_border = '#FFE082' %}
+        {% set title_color = '#6D4C00' %}
+        {% set sub_color = '#854F0B' %}
+      {% else %}
+        {% set score_bg = '#B91C1C' %}
+        {% set hero_bg = '#FEF2F2' %}
+        {% set hero_border = '#FCA5A5' %}
+        {% set title_color = '#7F1D1D' %}
+        {% set sub_color = '#9B1C1C' %}
+      {% endif %}
+
+      {% if pct == 100 %}
+        {% set result_msg = 'Perfect! You have aced it, ' ~ session.get('first_name') ~ '!' %}
+      {% elif pct >= 80 %}
+        {% set result_msg = 'Amazing! You have done brilliantly, ' ~ session.get('first_name') ~ '!' %}
+      {% elif pct >= 50 %}
+        {% set result_msg = 'Nicely done, but could be better!' %}
+      {% else %}
+        {% set result_msg = 'Nice try. Read more and try again!' %}
+      {% endif %}
+
+      <div class="result-hero" style="background:{{ hero_bg }};border-bottom:0.5px solid {{ hero_border }};">
+        <div class="score-circle" style="background:{{ score_bg }};">
           <div class="score-num">{{ result.score }}</div>
           <div class="score-total">out of {{ result.total_questions }}</div>
         </div>
-        <div class="result-title">Great job, {{ session.get('first_name') }}!</div>
-        <div class="result-sub">You scored {{ ((result.score / result.total_questions) * 100)|int }}% on {{ quiz.title }}</div>
+        <div class="result-title" style="color:{{ title_color }};">{{ result_msg }}</div>
+        <div class="result-sub" style="color:{{ sub_color }};">You scored {{ pct }}% on {{ quiz.title }}</div>
         <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
-          <a href="{{ url_for('start_quiz', quiz_id=quiz.id) }}" class="btn-primary">Retake quiz</a>
+          <a href="{{ url_for('start_quiz', quiz_id=quiz.id) }}" class="btn-primary" style="background:{{ score_bg }};">Retake quiz</a>
           <a href="{{ url_for('quizzes_list') }}" class="btn-outline">Back to quizzes</a>
         </div>
       </div>
@@ -246,7 +278,7 @@
           <div style="font-size:16px;font-weight:600;color:var(--color-text-primary);margin-bottom:16px;">Answer review</div>
           <div class="answers-review">
             {% for q in questions_review %}
-              {% set user_ans = user_answers.get(q.id) or user_answers.get(str(q.id)) %}
+              {% set user_ans = user_answers.get(q.id) or user_answers.get(q.id|string) %}
               {% set correct_ans = q.correct_option %}
               {% set is_correct = (user_ans == correct_ans) %}
               

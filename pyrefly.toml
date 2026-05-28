@@ -1,0 +1,5 @@
+[config]
+python_version = "3.13"
+search_path = [
+    "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages",
+]
